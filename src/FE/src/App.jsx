@@ -5,11 +5,11 @@ import ApprovalWait from './pages/ApprovalWait'
 import AdminDashboard from './pages/AdminDashboard'
 import StaffDashboard from './pages/StaffDashboard'
 import Suppliers from './pages/Suppliers'
-import Buyers from './pages/Buyers'
-import Products from './pages/Products'
-import Categories from './pages/Categories'
-import Profile from './pages/Profile'
-import Settings from './pages/Settings'
+import Buyers from './pages/StaffBuyers'
+import Products from './pages/StaffProducts'
+import Categories from './pages/StaffCategories'
+import Profile from './pages/StaffProfile'
+import Settings from './pages/StaffSettings'
 import ForgotPassword from './pages/ForgotPassword'
 import ForgotPasswordUUID from './pages/ForgotPasswordUUID'
 import VerifyUUID from './pages/VerifyUUID'
@@ -33,8 +33,10 @@ export default function App() {
         <Route path="/staff/products" element={<Products userRole="staff" />} />
         <Route path="/admin/categories" element={<Categories userRole="admin" />} />
         <Route path="/staff/categories" element={<Categories userRole="staff" />} />
-        <Route path="/profile" element={<Profile userRole="staff" />} />
-        <Route path="/settings" element={<Settings userRole="staff" />} />
+        <Route path="/staff/profile" element={<Profile userRole="staff" />} />
+        <Route path="/staff/settings" element={<Settings userRole="staff" />} />
+        <Route path="/admin/profile" element={<Profile userRole="admin" />} />
+        <Route path="/admin/settings" element={<Settings userRole="amin" />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-uuid" element={<ForgotPasswordUUID />} />
         <Route path="/verify-uuid" element={<VerifyUUID />} />
