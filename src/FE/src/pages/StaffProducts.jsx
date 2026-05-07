@@ -1,0 +1,216 @@
+import { useState } from 'react'
+import Sidebar from '../components/Sidebar'
+
+export default function Products({ userRole = 'admin' }) {
+  const [products, setProducts] = useState([
+    {
+      id: 'SKU-0001-01',
+      productName: 'Laptop Dell XPS 15',
+      category: 'Electronic',
+      supplier: 'Dell Vietnam',
+      price: '$1,659.00',
+      stockQuantity: 25,
+      description: 'Dell XPS 15'
+    }
+  ])
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [formData, setFormData] = useState({
+    productName: '',
+    category: '',
+    supplier: '',
+    price: '',
+    stockQuantity: '',
+    description: ''
+  })
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedSupplier, setSelectedSupplier] = useState('')
+
+  const handleOpenAddModal = () => {
+    setFormData({
+      productName: '',
+      category: '',
+      supplier: '',
+      price: '',
+      stockQuantity: '',
+      description: ''
+    })
+    setIsAddModalOpen(true)
+  }
+
+  const handleOpenEditModal = (product) => {
+    setFormData({
+      productName: product.productName,
+      category: product.category,
+      supplier: product.supplier,
+      price: product.price,
+      stockQuantity: product.stockQuantity,
+      description: product.description
+    })
+    setEditingId(product.id)
+    setIsEditModalOpen(true)
+  }
+
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false)
+    setFormData({
+      productName: '',
+      category: '',
+      supplier: '',
+      price: '',
+      stockQuantity: '',
+      description: ''
+    })
+  }
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false)
+    setEditingId(null)
+    setFormData({
+      productName: '',
+      category: '',
+      supplier: '',
+      price: '',
+      stockQuantity: '',
+      description: ''
+    })
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleAddProduct = () => {
+    if (formData.productName && formData.category && formData.supplier) {
+      const newProduct = {
+        id: `SKU-${String(products.length + 1).padStart(4, '0')}-01`,
+        ...formData
+      }
+      setProducts(prev => [...prev, newProduct])
+      handleCloseAddModal()
+    }
+  }
+
+  const handleEditProduct = () => {
+    if (formData.productName && formData.category && formData.supplier) {
+      setProducts(prev =>
+        prev.map(product =>
+          product.id === editingId ? { ...product, ...formData } : product
+        )
+      )
+      handleCloseEditModal()
+    }
+  }
+
+  const filteredProducts = products.filter(product =>
+    product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.id.toLowerCase().includes(searchTerm.toLowerCase())
+  ).filter(product => !selectedCategory || product.category === selectedCategory)
+   .filter(product => !selectedSupplier || product.supplier === selectedSupplier)
+
+  const categories = [...new Set(products.map(p => p.category))]
+  const suppliers = [...new Set(products.map(p => p.supplier))]
+
+  return (
+    <div className="dashboard-layout">
+      <Sidebar userRole={userRole} />
+
+      <main className="dashboard-main">
+        <div className="dashboard-header">
+          <div className="header-breadcrumb">
+            <a href="#" className="breadcrumb-link">Home</a>
+            <span className="breadcrumb-separator">›</span>
+            <span>Product</span>
+          </div>
+          <div className="header-content">
+            <h1>Product</h1>
+            <p>Manage your Products</p>
+          </div>
+        </div>
+
+        <div className="dashboard-container">
+          <div className="table-header">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="Search by code or name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="filter-group">
+              <select 
+                value={selectedCategory} 
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All Categories</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              <select 
+                value={selectedSupplier} 
+                onChange={(e) => setSelectedSupplier(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All Suppliers</option>
+                {suppliers.map(sup => (
+                  <option key={sup} value={sup}>{sup}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="table-container">
+            <table className="suppliers-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Supplier</th>
+                  <th>Price</th>
+                  <th>Stock Quantity</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProducts.map((product) => (
+                  <tr key={product.id}>
+                    <td>{product.id}</td>
+                    <td>{product.productName}</td>
+                    <td>{product.category}</td>
+                    <td>{product.supplier}</td>
+                    <td>{product.price}</td>
+                    <td>{product.stockQuantity}</td>
+                    <td>{product.description}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filteredProducts.length === 0 && (
+              <div className="no-data">
+                <p>Showing 1-10 of 1 products</p>
+              </div>
+            )}
+            {filteredProducts.length > 0 && (
+              <div className="table-footer">
+                <p>Showing 1-{filteredProducts.length} of {filteredProducts.length} products</p>
+                <div className="pagination">
+                  <button className="btn-pagination" disabled>Previous</button>
+                  <span className="page-number">1</span>
+                  <button className="btn-pagination" disabled>Next</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}

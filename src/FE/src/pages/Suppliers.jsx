@@ -108,9 +108,11 @@ export default function Suppliers({ userRole = 'admin' }) {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button className="btn-add" onClick={handleOpenAddModal}>
-              Add Supplier
-            </button>
+            {userRole === 'admin' && (
+              <button className="btn-add" onClick={handleOpenAddModal}>
+                Add Supplier
+              </button>
+            )}
           </div>
 
           <div className="table-container">
@@ -134,8 +136,12 @@ export default function Suppliers({ userRole = 'admin' }) {
                     <td>{supplier.email}</td>
                     <td>{supplier.address}</td>
                     <td className="actions-cell">
-                      <button className="btn-edit" onClick={() => handleOpenEditModal(supplier)}>Edit</button>
-                      <button className="btn-more">•••</button>
+                      {userRole === 'admin' && (
+                        <>
+                          <button className="btn-edit" onClick={() => handleOpenEditModal(supplier)}>Edit</button>
+                          <button className="btn-more">•••</button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
