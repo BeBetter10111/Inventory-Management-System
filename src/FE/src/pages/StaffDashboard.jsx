@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { LineChart, BarChart } from '../components/Charts'
+import { ProductIcon, TransactionIcon } from '../components/Icons'
 
 export default function StaffDashboard() {
   const stats = {
@@ -45,14 +46,18 @@ export default function StaffDashboard() {
           {/* Stats Cards */}
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-icon products">📦</div>
+              <div className="stat-icon products">
+                <ProductIcon />
+              </div>
               <div className="stat-info">
                 <p className="stat-number">{stats.totalProducts}</p>
                 <p className="stat-label">Total Products</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon transactions">📊</div>
+              <div className="stat-icon transactions">
+                <TransactionIcon />
+              </div>
               <div className="stat-info">
                 <p className="stat-number">{stats.totalTransactions}</p>
                 <p className="stat-label">Total Transactions</p>
