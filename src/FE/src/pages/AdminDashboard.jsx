@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import ChangePasswordModal from '../components/ChangePasswordModal'
 import { LineChart, BarChart } from '../components/Charts'
+import { UserIcon, ProductIcon, TransactionIcon } from '../components/Icons'
 
 export default function AdminDashboard() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
@@ -46,33 +47,30 @@ export default function AdminDashboard() {
         </div>
 
         <div className="dashboard-container">
-          <div className="dashboard-top">
-            <button 
-              className="btn-change-password"
-              onClick={() => setIsPasswordModalOpen(true)}
-            >
-              Change Password
-            </button>
-          </div>
-
           {/* Stats Cards */}
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-icon users">👤</div>
+              <div className="stat-icon users">
+                <UserIcon />
+              </div>
               <div className="stat-info">
                 <p className="stat-number">{stats.totalUsers}</p>
                 <p className="stat-label">Total Users</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon products">📦</div>
+              <div className="stat-icon products">
+                <ProductIcon />
+              </div>
               <div className="stat-info">
                 <p className="stat-number">{stats.totalProducts}</p>
                 <p className="stat-label">Total Products</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon transactions">📊</div>
+              <div className="stat-icon transactions">
+                <TransactionIcon />
+              </div>
               <div className="stat-info">
                 <p className="stat-number">{stats.totalTransactions}</p>
                 <p className="stat-label">Total Transactions</p>
