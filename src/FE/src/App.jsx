@@ -15,6 +15,7 @@ import ForgotPasswordUUID from './pages/ForgotPasswordUUID'
 import VerifyUUID from './pages/VerifyUUID'
 import NewPassword from './pages/NewPassword'
 import Inventory from './pages/StaffInventory'
+import Transactions from './pages/Transactions'
 
 export default function App() {
   return (
@@ -26,6 +27,8 @@ export default function App() {
         <Route path="/approval" element={<ApprovalWait />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/staff" element={<StaffDashboard />} />
+        <Route path="/admin/transactions" element={<Transactions userRole="admin" />} />
+        <Route path="/staff/transactions" element={<Transactions userRole="staff" />} />
         <Route path="/admin/suppliers" element={<Suppliers userRole="admin" />} />
         <Route path="/staff/suppliers" element={<Suppliers userRole="staff" />} />
         <Route path="/admin/buyers" element={<Buyers userRole="admin" />} />

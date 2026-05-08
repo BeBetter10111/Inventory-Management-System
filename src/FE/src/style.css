@@ -959,6 +959,34 @@ html, body, #app {
   color: #1e40af;
 }
 
+.badge-import {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-export {
+  background-color: #fed7aa;
+  color: #92400e;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 6px;
+}
+
+.detail-group p {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  margin: 0;
+}
+
 /* Responsive Dashboard */
 @media (max-width: 1024px) {
   .sidebar {
@@ -1237,6 +1265,23 @@ a:hover {
 .btn-more:hover {
   background-color: #f9fafb;
   color: var(--text-dark);
+}
+
+.btn-view {
+  padding: 6px 12px;
+  background-color: white;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.btn-view:hover {
+  background-color: var(--accent-color);
+  color: white;
 }
 
 .no-data {
