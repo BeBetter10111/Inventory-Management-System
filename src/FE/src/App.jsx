@@ -14,6 +14,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ForgotPasswordUUID from './pages/ForgotPasswordUUID'
 import VerifyUUID from './pages/VerifyUUID'
 import NewPassword from './pages/NewPassword'
+import Inventory from './pages/StaffInventory'
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/reset-uuid" element={<ForgotPasswordUUID />} />
         <Route path="/verify-uuid" element={<VerifyUUID />} />
         <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/staff/inventory" element={<Inventory userRole="staff" />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
