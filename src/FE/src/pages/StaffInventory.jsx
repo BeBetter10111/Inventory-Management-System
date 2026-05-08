@@ -107,9 +107,8 @@ export default function StaffInventory({ userRole = 'staff' }) {
 
       {/* Import Modal */}
       {isImportModalOpen && (
-        <>
-          <div className="modal-overlay" onClick={() => setIsImportModalOpen(false)}></div>
-          <div className="modal-content" style={{ maxWidth: '600px' }}>
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setIsImportModalOpen(false)}>
+          <div className="modal-content">
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', textAlign: 'left', marginBottom: '20px' }}>
               <h2 style={{ margin: 0 }}>New Import Transaction</h2>
               <button onClick={() => setIsImportModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>✕</button>
@@ -149,14 +148,13 @@ export default function StaffInventory({ userRole = 'staff' }) {
               </div>
             </form>
           </div>
-        </>
+        </div>
       )}
 
       {/* Export Modal */}
       {isExportModalOpen && (
-        <>
-          <div className="modal-overlay" onClick={() => setIsExportModalOpen(false)}></div>
-          <div className="modal-content" style={{ maxWidth: '600px' }}>
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setIsExportModalOpen(false)}>
+          <div className="modal-content">
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', textAlign: 'left', marginBottom: '20px' }}>
               <h2 style={{ margin: 0 }}>New Export Transaction</h2>
               <button onClick={() => setIsExportModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>✕</button>
@@ -196,7 +194,7 @@ export default function StaffInventory({ userRole = 'staff' }) {
               </div>
             </form>
           </div>
-        </>
+        </div>
       )}
     </div>
   )
