@@ -12,7 +12,7 @@ export default function Sidebar({ userRole }) {
     { label: 'Suppliers', icon: '🚚', path: '/admin/suppliers' },
     { label: 'Buyers', icon: '👥', path: '/admin/buyers' },
     { label: 'Users', icon: '👤', path: '/admin/users' },
-    { label: 'Activity Logs', icon: '📋', path: '/admin/logs' }
+    { label: 'Activity Logs', icon: '📋', path: '/admin/activity-logs' }
   ]
 
   const staffMenuItems = [

@@ -16,6 +16,8 @@ import VerifyUUID from './pages/VerifyUUID'
 import NewPassword from './pages/NewPassword'
 import Inventory from './pages/StaffInventory'
 import Transactions from './pages/Transactions'
+import ActivityLogPage from './pages/ActivityLogPage'
+import UserPage from './pages/UserPage'
 
 export default function App() {
   return (
@@ -46,6 +48,8 @@ export default function App() {
         <Route path="/verify-uuid" element={<VerifyUUID />} />
         <Route path="/new-password" element={<NewPassword />} />
         <Route path="/staff/inventory" element={<Inventory userRole="staff" />} />
+        <Route path="/admin/activity-logs" element={<ActivityLogPage userRole="admin" />} />
+        <Route path="/admin/users" element={<UserPage userRole="admin" />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
