@@ -16,7 +16,10 @@ export default function Products({ userRole = 'admin' }) {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
+  const [deletingItemName, setDeletingItemName] = useState('')
   const [formData, setFormData] = useState({
     productName: '',
     category: '',
@@ -101,7 +104,24 @@ export default function Products({ userRole = 'admin' }) {
         prev.map(product =>
           product.id === editingId ? { ...product, ...formData } : product
         )
-      )
+   
+
+  const handleOpenDeleteModal = (product) => {
+    setDeletingId(product.id)
+    setDeletingItemName(product.productName)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setDeletingId(null)
+    setDeletingItemName('')
+  }
+
+  const handleConfirmDelete = () => {
+    setProducts(prev => prev.filter(product => product.id !== deletingId))
+    handleCloseDeleteModal()
+  }   )
       handleCloseEditModal()
     }
   }
@@ -164,6 +184,11 @@ export default function Products({ userRole = 'admin' }) {
                 ))}
               </select>
             </div>
+            {userRole === 'admin' && (
+              <button className="btn-add" onClick={handleOpenAddModal}>
+                Add Product
+              </button>
+            )}
           </div>
 
           <div className="table-container">
@@ -177,6 +202,7 @@ export default function Products({ userRole = 'admin' }) {
                   <th>Price</th>
                   <th>Stock Quantity</th>
                   <th>Description</th>
+                  {userRole === 'admin' && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -189,6 +215,12 @@ export default function Products({ userRole = 'admin' }) {
                     <td>{product.price}</td>
                     <td>{product.stockQuantity}</td>
                     <td>{product.description}</td>
+                    {userRole === 'admin' && (
+                      <td className="actions-cell">
+                        <button className="btn-edit" onClick={() => handleOpenEditModal(product)}>Edit</button>
+                        <button className="btn-more" onClick={() => handleOpenDeleteModal(product)}>•••</button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -210,6 +242,182 @@ export default function Products({ userRole = 'admin' }) {
             )}
           </div>
         </div>
+
+        {/* Add Product Modal */}
+        {isAddModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseAddModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Add New Product</h2>
+                <button className="btn-close" onClick={handleCloseAddModal}>×</button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Product Name</label>
+                  <input
+                    type="text"
+                    name="productName"
+                    placeholder="Enter product name"
+                    value={formData.productName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Category</label>
+                    <input
+                      type="text"
+                      name="category"
+                      placeholder="Enter category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Supplier</label>
+                    <input
+                      type="text"
+                      name="supplier"
+                      placeholder="Enter supplier"
+                      value={formData.supplier}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Price</label>
+                    <input
+                      type="text"
+                      name="price"
+                      placeholder="Enter price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Stock Quantity</label>
+                    <input
+                      type="number"
+                      name="stockQuantity"
+                      placeholder="Enter quantity"
+                      value={formData.stockQuantity}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    placeholder="Enter description"
+                    rows="3"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseAddModal}>Cancel</button>
+                <button className="btn-submit" onClick={handleAddProduct}>Add</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Product Modal */}
+        {isEditModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseEditModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Edit Product</h2>
+                <button className="btn-close" onClick={handleCloseEditModal}>×</button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Product Name</label>
+                  <input
+                    type="text"
+                    name="productName"
+                    value={formData.productName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Category</label>
+                    <input
+                      type="text"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Supplier</label>
+                    <input
+                      type="text"
+                      name="supplier"
+                      value={formData.supplier}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Price</label>
+                    <input
+                      type="text"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Stock Quantity</label>
+                    <input
+                      type="number"
+                      name="stockQuantity"
+                      value={formData.stockQuantity}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    name="description"
+                    rows="3"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseEditModal}>Cancel</button>
+                <button className="btn-submit" onClick={handleEditProduct}>Save</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Product Modal */}
+        {isDeleteModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseDeleteModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Remove this product?</h2>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to remove product "{deletingItemName}"? This action is irreversible!</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseDeleteModal}>Cancel</button>
+                <button className="btn-delete" onClick={handleConfirmDelete}>Disable</button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

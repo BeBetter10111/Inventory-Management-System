@@ -14,7 +14,10 @@ export default function Suppliers({ userRole = 'admin' }) {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
+  const [deletingItemName, setDeletingItemName] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -75,6 +78,23 @@ export default function Suppliers({ userRole = 'admin' }) {
       )
       handleCloseEditModal()
     }
+  }
+
+  const handleOpenDeleteModal = (supplier) => {
+    setDeletingId(supplier.id)
+    setDeletingItemName(supplier.name)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setDeletingId(null)
+    setDeletingItemName('')
+  }
+
+  const handleConfirmDelete = () => {
+    setSuppliers(prev => prev.filter(supplier => supplier.id !== deletingId))
+    handleCloseDeleteModal()
   }
 
   const filteredSuppliers = suppliers.filter(supplier =>
@@ -139,7 +159,7 @@ export default function Suppliers({ userRole = 'admin' }) {
                       {userRole === 'admin' && (
                         <>
                           <button className="btn-edit" onClick={() => handleOpenEditModal(supplier)}>Edit</button>
-                          <button className="btn-more">•••</button>
+                          <button className="btn-more" onClick={() => handleOpenDeleteModal(supplier)}>•••</button>
                         </>
                       )}
                     </td>
@@ -276,6 +296,24 @@ export default function Suppliers({ userRole = 'admin' }) {
               <div className="modal-footer">
                 <button className="btn-cancel" onClick={handleCloseEditModal}>Cancel</button>
                 <button className="btn-submit" onClick={handleEditSupplier}>Save</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Supplier Modal */}
+        {isDeleteModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseDeleteModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Remove this supplier?</h2>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to remove supplier "{deletingItemName}"? This action is irreversible!</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseDeleteModal}>Cancel</button>
+                <button className="btn-delete" onClick={handleConfirmDelete}>Disable</button>
               </div>
             </div>
           </div>

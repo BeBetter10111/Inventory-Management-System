@@ -1458,6 +1458,22 @@ a:hover {
   background-color: var(--primary-light);
 }
 
+.btn-delete {
+  padding: 10px 24px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-delete:hover {
+  background-color: #b91c1c;
+}
+
 /* Responsive Table */
 @media (max-width: 768px) {
   .modal-overlay {

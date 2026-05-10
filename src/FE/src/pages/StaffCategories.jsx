@@ -12,7 +12,10 @@ export default function Categories({ userRole = 'admin' }) {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
+  const [deletingItemName, setDeletingItemName] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     unit: ''
@@ -71,6 +74,23 @@ export default function Categories({ userRole = 'admin' }) {
     }
   }
 
+  const handleOpenDeleteModal = (category) => {
+    setDeletingId(category.id)
+    setDeletingItemName(category.name)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setDeletingId(null)
+    setDeletingItemName('')
+  }
+
+  const handleConfirmDelete = () => {
+    setCategories(prev => prev.filter(category => category.id !== deletingId))
+    handleCloseDeleteModal()
+  }
+
   const filteredCategories = categories.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -102,6 +122,11 @@ export default function Categories({ userRole = 'admin' }) {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            {userRole === 'admin' && (
+              <button className="btn-add" onClick={handleOpenAddModal}>
+                Add Category
+              </button>
+            )}
           </div>
 
           <div className="table-container">
@@ -111,6 +136,7 @@ export default function Categories({ userRole = 'admin' }) {
                   <th>#</th>
                   <th>Category Name</th>
                   <th>Unit</th>
+                  {userRole === 'admin' && <th>Actions</th>}
                 </tr>
               </thead>
               <tbody>
@@ -119,6 +145,12 @@ export default function Categories({ userRole = 'admin' }) {
                     <td>{category.id}</td>
                     <td>{category.name}</td>
                     <td>{category.unit}</td>
+                    {userRole === 'admin' && (
+                      <td className="actions-cell">
+                        <button className="btn-edit" onClick={() => handleOpenEditModal(category)}>Edit</button>
+                        <button className="btn-more" onClick={() => handleOpenDeleteModal(category)}>•••</button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -140,6 +172,98 @@ export default function Categories({ userRole = 'admin' }) {
             )}
           </div>
         </div>
+
+        {/* Add Category Modal */}
+        {isAddModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseAddModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Add New Category</h2>
+                <button className="btn-close" onClick={handleCloseAddModal}>×</button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Category Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter category name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Unit</label>
+                  <input
+                    type="text"
+                    name="unit"
+                    placeholder="Enter unit"
+                    value={formData.unit}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseAddModal}>Cancel</button>
+                <button className="btn-submit" onClick={handleAddCategory}>Add</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Category Modal */}
+        {isEditModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseEditModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Edit Category</h2>
+                <button className="btn-close" onClick={handleCloseEditModal}>×</button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Category Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Unit</label>
+                  <input
+                    type="text"
+                    name="unit"
+                    value={formData.unit}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseEditModal}>Cancel</button>
+                <button className="btn-submit" onClick={handleEditCategory}>Save</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Category Modal */}
+        {isDeleteModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseDeleteModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Remove this category?</h2>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to remove category "{deletingItemName}"? This action is irreversible!</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseDeleteModal}>Cancel</button>
+                <button className="btn-delete" onClick={handleConfirmDelete}>Disable</button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
