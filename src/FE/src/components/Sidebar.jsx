@@ -49,11 +49,23 @@ export default function Sidebar({ userRole }) {
 
       <div className="sidebar-footer">
         <div className="divider"></div>
-        <button className="nav-item footer-item" onClick={() => navigate('/settings')}>
+        <button className="nav-item footer-item" onClick={() => {
+          if (userRole === 'admin') {
+            navigate('/admin/settings')
+          } else if (userRole === 'staff') {
+            navigate('/staff/settings')
+          }
+        }}>
           <span className="nav-icon">⚙️</span>
           <span className="nav-label">Settings</span>
         </button>
-        <button className="nav-item footer-item" onClick={() => navigate('/profile')}>
+        <button className="nav-item footer-item" onClick={() => {
+          if (userRole === 'admin') {
+            navigate('/admin/profile')
+          } else if (userRole === 'staff') {
+            navigate('/staff/profile')
+          }
+        }}>
           <span className="nav-icon">👤</span>
           <span className="nav-label">Your Profile</span>
         </button>
