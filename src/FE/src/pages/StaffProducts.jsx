@@ -104,7 +104,10 @@ export default function Products({ userRole = 'admin' }) {
         prev.map(product =>
           product.id === editingId ? { ...product, ...formData } : product
         )
-   
+      )
+      handleCloseEditModal()
+    }
+  }
 
   const handleOpenDeleteModal = (product) => {
     setDeletingId(product.id)
@@ -121,9 +124,6 @@ export default function Products({ userRole = 'admin' }) {
   const handleConfirmDelete = () => {
     setProducts(prev => prev.filter(product => product.id !== deletingId))
     handleCloseDeleteModal()
-  }   )
-      handleCloseEditModal()
-    }
   }
 
   const filteredProducts = products.filter(product =>

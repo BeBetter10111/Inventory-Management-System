@@ -121,7 +121,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage)
 
-  const roles = ['All Roles', 'Admin', 'Staff', 'Manager']
+  const roles = ['All Roles', 'Admin', 'Staff']
   const statuses = ['All Status', 'Active', 'Inactive', 'Pending']
 
   const handlePreviousPage = () => {
