@@ -15,8 +15,14 @@ export default function UserPage({ userRole = 'admin' }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [isDisableModalOpen, setIsDisableModalOpen] = useState(false)
+  const [isApproveModalOpen, setIsApproveModalOpen] = useState(false)
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false)
+  const [isEnableModalOpen, setIsEnableModalOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [viewingUser, setViewingUser] = useState(null)
+  const [actioningUser, setActioningUser] = useState(null)
+  const [rejectReason, setRejectReason] = useState('')
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -64,6 +70,88 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false)
     setViewingUser(null)
+  }
+
+  const handleOpenDisableModal = (user) => {
+    setActioningUser(user)
+    setIsDisableModalOpen(true)
+  }
+
+  const handleCloseDisableModal = () => {
+    setIsDisableModalOpen(false)
+    setActioningUser(null)
+  }
+
+  const handleConfirmDisable = () => {
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === actioningUser.id ? { ...user, status: 'Inactive' } : user
+      )
+    )
+    handleCloseDisableModal()
+    handleCloseViewModal()
+  }
+
+  const handleOpenApproveModal = (user) => {
+    setActioningUser(user)
+    setIsApproveModalOpen(true)
+  }
+
+  const handleCloseApproveModal = () => {
+    setIsApproveModalOpen(false)
+    setActioningUser(null)
+  }
+
+  const handleConfirmApprove = () => {
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === actioningUser.id ? { ...user, status: 'Active' } : user
+      )
+    )
+    handleCloseApproveModal()
+    handleCloseViewModal()
+  }
+
+  const handleOpenRejectModal = (user) => {
+    setActioningUser(user)
+    setRejectReason('')
+    setIsRejectModalOpen(true)
+  }
+
+  const handleCloseRejectModal = () => {
+    setIsRejectModalOpen(false)
+    setActioningUser(null)
+    setRejectReason('')
+  }
+
+  const handleConfirmReject = () => {
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === actioningUser.id ? { ...user, status: 'Inactive' } : user
+      )
+    )
+    handleCloseRejectModal()
+    handleCloseViewModal()
+  }
+
+  const handleOpenEnableModal = (user) => {
+    setActioningUser(user)
+    setIsEnableModalOpen(true)
+  }
+
+  const handleCloseEnableModal = () => {
+    setIsEnableModalOpen(false)
+    setActioningUser(null)
+  }
+
+  const handleConfirmEnable = () => {
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === actioningUser.id ? { ...user, status: 'Active' } : user
+      )
+    )
+    handleCloseEnableModal()
+    handleCloseViewModal()
   }
 
   const handleInputChange = (e) => {
@@ -419,38 +507,158 @@ export default function UserPage({ userRole = 'admin' }) {
           </div>
         )}
 
-        {/* View User Modal */}
+        {/* View User Profile Card Modal */}
         {isViewModalOpen && viewingUser && (
           <div className="modal-overlay" onClick={handleCloseViewModal}>
+            <div className="profile-card-modal" onClick={(e) => e.stopPropagation()}>
+              <button className="profile-close-btn" onClick={handleCloseViewModal}>×</button>
+              
+              <div className="profile-card-header">
+                <h3>{viewingUser.fullName}</h3>
+                <span className={`profile-badge profile-badge-${viewingUser.status.toLowerCase()}`}>
+                  {viewingUser.status}
+                </span>
+                {viewingUser.role && <span className="profile-role-badge">{viewingUser.role}</span>}
+              </div>
+
+              <div className="profile-card-body">
+                <div className="profile-info-section">
+                  <h4>Personal Information</h4>
+                  <p>Update your personal details and information.</p>
+                  
+                  <div className="profile-info-grid">
+                    <div className="info-item">
+                      <label>Username</label>
+                      <span>{viewingUser.id}</span>
+                    </div>
+                    <div className="info-item">
+                      <label>Full Name</label>
+                      <span>{viewingUser.fullName}</span>
+                    </div>
+                  </div>
+
+                  <div className="profile-info-grid">
+                    <div className="info-item">
+                      <label>Email</label>
+                      <span>{viewingUser.email}</span>
+                    </div>
+                    <div className="info-item">
+                      <label>Role</label>
+                      <span>{viewingUser.role}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="profile-card-footer">
+                {viewingUser.status === 'Active' && (
+                  <>
+                    <button className="btn-edit-profile" onClick={() => handleOpenEditModal(viewingUser)}>
+                      Edit User
+                    </button>
+                    <button className="btn-disable-profile" onClick={() => handleOpenDisableModal(viewingUser)}>
+                      Disable User
+                    </button>
+                  </>
+                )}
+                
+                {viewingUser.status === 'Pending' && (
+                  <>
+                    <button className="btn-approve-profile" onClick={() => handleOpenApproveModal(viewingUser)}>
+                      Approve
+                    </button>
+                    <button className="btn-reject-profile" onClick={() => handleOpenRejectModal(viewingUser)}>
+                      Reject
+                    </button>
+                  </>
+                )}
+                
+                {viewingUser.status === 'Inactive' && (
+                  <button className="btn-enable-profile" onClick={() => handleOpenEnableModal(viewingUser)}>
+                    Enable User
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Disable User Modal */}
+        {isDisableModalOpen && actioningUser && (
+          <div className="modal-overlay" onClick={handleCloseDisableModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h2>User Details</h2>
-                <button className="modal-close" onClick={handleCloseViewModal}>✕</button>
+                <h2>Disable this user?</h2>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to disable user? The user cannot have access to your system.</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseDisableModal}>Cancel</button>
+                <button className="btn-delete" onClick={handleConfirmDisable}>Disable</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Approve User Modal */}
+        {isApproveModalOpen && actioningUser && (
+          <div className="modal-overlay" onClick={handleCloseApproveModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Approve this user?</h2>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to approve this user? This grants user access to your system within their role.</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseApproveModal}>Cancel</button>
+                <button className="btn-approve" onClick={handleConfirmApprove}>Approve</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reject User Modal */}
+        {isRejectModalOpen && actioningUser && (
+          <div className="modal-overlay" onClick={handleCloseRejectModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Reject this user?</h2>
               </div>
               <div className="modal-body">
                 <div className="form-group">
-                  <label>Full Name</label>
-                  <p className="field-value">{viewingUser.fullName}</p>
+                  <label>Reason for rejection</label>
+                  <textarea
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    placeholder="Reason for rejecting this user"
+                    rows="3"
+                  ></textarea>
                 </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <p className="field-value">{viewingUser.email}</p>
-                </div>
-                <div className="form-group">
-                  <label>Role</label>
-                  <p className="field-value">{viewingUser.role}</p>
-                </div>
-                <div className="form-group">
-                  <label>Status</label>
-                  <p className="field-value">
-                    <span className={`status-badge status-${viewingUser.status.toLowerCase()}`}>
-                      {viewingUser.status}
-                    </span>
-                  </p>
-                </div>
+                <p>Are you sure you want to reject this user? This action is irreversible!</p>
               </div>
               <div className="modal-footer">
-                <button className="btn-secondary" onClick={handleCloseViewModal}>Close</button>
+                <button className="btn-cancel" onClick={handleCloseRejectModal}>Cancel</button>
+                <button className="btn-delete" onClick={handleConfirmReject}>Reject</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Enable User Modal */}
+        {isEnableModalOpen && actioningUser && (
+          <div className="modal-overlay" onClick={handleCloseEnableModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Enable this user?</h2>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to enable user? This grants the user access to your system within their role again.</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseEnableModal}>Cancel</button>
+                <button className="btn-approve" onClick={handleConfirmEnable}>Enable</button>
               </div>
             </div>
           </div>

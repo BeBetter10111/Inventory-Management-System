@@ -1474,6 +1474,216 @@ a:hover {
   background-color: #b91c1c;
 }
 
+.btn-approve {
+  padding: 10px 24px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-approve:hover {
+  background-color: #059669;
+}
+
+/* Profile Card Styles */
+.profile-card-modal {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 550px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.profile-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-light);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.profile-close-btn:hover {
+  background-color: #f3f4f6;
+  color: var(--text-dark);
+}
+
+.profile-card-header {
+  padding: 40px 40px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-card-header h3 {
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  font-weight: 600;
+  margin: 0;
+}
+
+.profile-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.profile-badge-active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.profile-badge-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.profile-badge-inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.profile-role-badge {
+  padding: 6px 12px;
+  background-color: #ede9fe;
+  color: #6d28d9;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.profile-card-body {
+  padding: 30px 40px;
+  flex: 1;
+}
+
+.profile-info-section h4 {
+  font-size: 1rem;
+  color: var(--text-dark);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.profile-info-section p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.info-item label {
+  display: block;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.info-item span {
+  display: block;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.profile-card-footer {
+  padding: 20px 40px 30px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btn-edit-profile,
+.btn-disable-profile,
+.btn-approve-profile,
+.btn-reject-profile,
+.btn-enable-profile {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit-profile {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-edit-profile:hover {
+  background-color: var(--primary-light);
+}
+
+.btn-disable-profile {
+  background-color: #dc2626;
+  color: white;
+}
+
+.btn-disable-profile:hover {
+  background-color: #b91c1c;
+}
+
+.btn-approve-profile {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-approve-profile:hover {
+  background-color: #059669;
+}
+
+.btn-reject-profile {
+  background-color: #dc2626;
+  color: white;
+}
+
+.btn-reject-profile:hover {
+  background-color: #b91c1c;
+}
+
+.btn-enable-profile {
+  background-color: #10b981;
+  color: white;
+  flex-grow: 1;
+}
+
+.btn-enable-profile:hover {
+  background-color: #059669;
+}
+
 /* Responsive Table */
 @media (max-width: 768px) {
   .modal-overlay {
