@@ -13,6 +13,7 @@ export default function Categories({ userRole = 'admin' }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [notification, setNotification] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [deletingItemName, setDeletingItemName] = useState('')
@@ -21,6 +22,11 @@ export default function Categories({ userRole = 'admin' }) {
     unit: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message })
+    setTimeout(() => setNotification(null), 4000)
+  }
 
   const handleOpenAddModal = () => {
     setFormData({ name: '', unit: '' })
@@ -54,12 +60,19 @@ export default function Categories({ userRole = 'admin' }) {
 
   const handleAddCategory = () => {
     if (formData.name && formData.unit) {
-      const newCategory = {
-        id: `CAT-${categories.length + 1}`,
-        ...formData
+      try {
+        const newCategory = {
+          id: `CAT-${categories.length + 1}`,
+          ...formData
+        }
+        setCategories(prev => [...prev, newCategory])
+        handleCloseAddModal()
+        showNotification('success', `Category "${formData.name}" has been added`)
+      } catch (error) {
+        showNotification('error', `Error occurred while adding category "${formData.name}": ${error.message}`)
       }
-      setCategories(prev => [...prev, newCategory])
-      handleCloseAddModal()
+    } else {
+      showNotification('error', 'Please fill in all required fields')
     }
   }
 
@@ -98,6 +111,13 @@ export default function Categories({ userRole = 'admin' }) {
   return (
     <div className="dashboard-layout">
       <Sidebar userRole={userRole} />
+
+      {notification && (
+        <div className={`notification-toast notification-${notification.type}`}>
+          <span className="notification-icon">{notification.type === 'success' ? '✓' : '✕'}</span>
+          <span className="notification-message">{notification.message}</span>
+        </div>
+      )}
 
       <main className="dashboard-main">
         <div className="dashboard-header">

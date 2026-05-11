@@ -15,6 +15,7 @@ export default function Suppliers({ userRole = 'admin' }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [notification, setNotification] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [deletingItemName, setDeletingItemName] = useState('')
@@ -25,6 +26,11 @@ export default function Suppliers({ userRole = 'admin' }) {
     address: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message })
+    setTimeout(() => setNotification(null), 4000)
+  }
 
   const handleOpenAddModal = () => {
     setFormData({ name: '', contact: '', email: '', address: '' })
@@ -60,12 +66,19 @@ export default function Suppliers({ userRole = 'admin' }) {
 
   const handleAddSupplier = () => {
     if (formData.name && formData.contact && formData.email && formData.address) {
-      const newSupplier = {
-        id: `SP-${suppliers.length + 1}`,
-        ...formData
+      try {
+        const newSupplier = {
+          id: `SP-${suppliers.length + 1}`,
+          ...formData
+        }
+        setSuppliers(prev => [...prev, newSupplier])
+        handleCloseAddModal()
+        showNotification('success', `Supplier "${formData.name}" has been added`)
+      } catch (error) {
+        showNotification('error', `Error occurred while adding supplier "${formData.name}": ${error.message}`)
       }
-      setSuppliers(prev => [...prev, newSupplier])
-      handleCloseAddModal()
+    } else {
+      showNotification('error', 'Please fill in all required fields')
     }
   }
 
@@ -104,6 +117,13 @@ export default function Suppliers({ userRole = 'admin' }) {
   return (
     <div className="dashboard-layout">
       <Sidebar userRole={userRole} />
+
+      {notification && (
+        <div className={`notification-toast notification-${notification.type}`}>
+          <span className="notification-icon">{notification.type === 'success' ? '✓' : '✕'}</span>
+          <span className="notification-message">{notification.message}</span>
+        </div>
+      )}
 
       <main className="dashboard-main">
         <div className="dashboard-header">

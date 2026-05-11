@@ -14,6 +14,7 @@ export default function Buyers({ userRole = 'admin' }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [notification, setNotification] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [deletingItemName, setDeletingItemName] = useState('')
@@ -23,6 +24,11 @@ export default function Buyers({ userRole = 'admin' }) {
     email: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message })
+    setTimeout(() => setNotification(null), 4000)
+  }
 
   const handleOpenAddModal = () => {
     setFormData({ name: '', phoneNumber: '', email: '' })
@@ -52,17 +58,27 @@ export default function Buyers({ userRole = 'admin' }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   const handleAddBuyer = () => {
     if (formData.name && formData.phoneNumber && formData.email) {
-      const newBuyer = {
-        id: `BR-${buyers.length + 1}`,
-        ...formData
+      try {
+        const newBuyer = {
+          id: `BR-${buyers.length + 1}`,
+          ...formData
+        }
+        setBuyers(prev => [...prev, newBuyer])
+        handleCloseAddModal()
+        showNotification('success', `Buyer "${formData.name}" has been added`)
+      } catch (error) {
+        showNotification('error', `Error occurred while adding buyer "${formData.name}": ${error.message}`)
       }
-      setBuyers(prev => [...prev, newBuyer])
-      handleCloseAddModal()
+    } else {
+      showNotification('error', 'Please fill in all required fields')
     }
   }
 
@@ -102,6 +118,13 @@ export default function Buyers({ userRole = 'admin' }) {
   return (
     <div className="dashboard-layout">
       <Sidebar userRole={userRole} />
+
+      {notification && (
+        <div className={`notification-toast notification-${notification.type}`}>
+          <span className="notification-icon">{notification.type === 'success' ? '✓' : '✕'}</span>
+          <span className="notification-message">{notification.message}</span>
+        </div>
+      )}
 
       <main className="dashboard-main">
         <div className="dashboard-header">

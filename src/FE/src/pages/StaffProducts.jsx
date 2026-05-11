@@ -17,6 +17,7 @@ export default function Products({ userRole = 'admin' }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [notification, setNotification] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [deletingItemName, setDeletingItemName] = useState('')
@@ -31,6 +32,11 @@ export default function Products({ userRole = 'admin' }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedSupplier, setSelectedSupplier] = useState('')
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message })
+    setTimeout(() => setNotification(null), 4000)
+  }
 
   const handleOpenAddModal = () => {
     setFormData({
@@ -89,12 +95,19 @@ export default function Products({ userRole = 'admin' }) {
 
   const handleAddProduct = () => {
     if (formData.productName && formData.category && formData.supplier) {
-      const newProduct = {
-        id: `SKU-${String(products.length + 1).padStart(4, '0')}-01`,
-        ...formData
+      try {
+        const newProduct = {
+          id: `SKU-${String(products.length + 1).padStart(4, '0')}-01`,
+          ...formData
+        }
+        setProducts(prev => [...prev, newProduct])
+        handleCloseAddModal()
+        showNotification('success', `Product "${formData.productName}" has been added`)
+      } catch (error) {
+        showNotification('error', `Error occurred while adding product "${formData.productName}": ${error.message}`)
       }
-      setProducts(prev => [...prev, newProduct])
-      handleCloseAddModal()
+    } else {
+      showNotification('error', 'Please fill in all required fields')
     }
   }
 
@@ -138,6 +151,13 @@ export default function Products({ userRole = 'admin' }) {
   return (
     <div className="dashboard-layout">
       <Sidebar userRole={userRole} />
+
+      {notification && (
+        <div className={`notification-toast notification-${notification.type}`}>
+          <span className="notification-icon">{notification.type === 'success' ? '✓' : '✕'}</span>
+          <span className="notification-message">{notification.message}</span>
+        </div>
+      )}
 
       <main className="dashboard-main">
         <div className="dashboard-header">
