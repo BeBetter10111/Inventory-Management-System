@@ -28,8 +28,18 @@ export default function SignUp() {
       return
     }
     // TODO: Add registration logic
-    console.log('Sign up attempt:', formData)
-    navigate('/approval')
+    if (!formData.username || !formData.fullName || !formData.email || !formData.phone || !formData.password || !formData.role) {
+      alert('Please fill in all fields!')
+      return
+    }
+    if (formData.role === 'staff') {
+      console.log('Sign up attempt:', formData)
+      navigate('/approval')
+    }
+    if (formData.role === 'admin') {
+      console.log('Sign up attempt:', formData)
+      navigate('/admin')
+    }
   }
 
   return (
