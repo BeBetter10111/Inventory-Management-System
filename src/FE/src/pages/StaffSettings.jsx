@@ -1,9 +1,15 @@
 import Sidebar from '../components/Sidebar'
 
-export default function Settings({ userRole = 'staff' }) {
+export default function Settings({ userRole}) {
   const handleLogout = () => {
-    // Handle logout logic
-    alert('Logging out...')
+    // Add actual logout functionality here
+    // For now, just navigate to the login page
+    // Clear any authentication tokens or user data here if needed
+    localStorage.removeItem('authToken')
+    sessionStorage.removeItem('userData')
+    window.location.href = '/login'
+
+
   }
 
   return (
