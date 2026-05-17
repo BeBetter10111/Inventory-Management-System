@@ -1,20 +1,52 @@
+import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
+import Notification from '../components/Notification'
+import LogoutConfirmModal from '../components/LogoutConfirmModal'
 
-export default function Settings({ userRole}) {
-  const handleLogout = () => {
-    // Add actual logout functionality here
-    // For now, just navigate to the login page
-    // Clear any authentication tokens or user data here if needed
+export default function Settings({ userRole }) {
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [notification, setNotification] = useState(null)
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true)
+  }
+
+  const handleConfirmLogout = () => {
+    setShowLogoutConfirm(false)
+    setNotification({ type: 'success', message: 'You have been logged out successfully!' })
+    
+    // Clear any authentication tokens or user data
     localStorage.removeItem('authToken')
+    localStorage.removeItem('app_token')
+    localStorage.removeItem('app_user')
     sessionStorage.removeItem('userData')
-    window.location.href = '/login'
+    
+    setTimeout(() => {
+      window.location.href = '/login'
+    }, 1500)
+  }
 
-
+  const handleCancelLogout = () => {
+    setShowLogoutConfirm(false)
   }
 
   return (
     <div className="dashboard-layout">
       <Sidebar userRole={userRole} />
+
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
+      <LogoutConfirmModal
+        isOpen={showLogoutConfirm}
+        onConfirm={handleConfirmLogout}
+        onCancel={handleCancelLogout}
+      />
 
       <main className="dashboard-main">
         <div className="dashboard-header">
@@ -55,7 +87,7 @@ export default function Settings({ userRole}) {
                   <h4>Log out</h4>
                   <p>Log out of your account</p>
                 </div>
-                <button className="btn-logout" onClick={handleLogout}>Log out</button>
+                <button className="btn-logout" onClick={handleLogoutClick}>Log out</button>
               </div>
             </div>
           </div>
