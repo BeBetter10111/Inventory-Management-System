@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 
-export default function Sidebar({ userRole }) {
+export default function Sidebar({ userRole}) {
   const navigate = useNavigate()
   const location = useLocation()
 

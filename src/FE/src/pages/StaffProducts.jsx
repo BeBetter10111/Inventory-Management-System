@@ -119,6 +119,9 @@ export default function Products({ userRole = 'admin' }) {
         )
       )
       handleCloseEditModal()
+      showNotification('success', `Product "${formData.productName}" has been updated`)
+    } else {
+      showNotification('error', 'Please fill in all required fields')
     }
   }
 
@@ -137,6 +140,7 @@ export default function Products({ userRole = 'admin' }) {
   const handleConfirmDelete = () => {
     setProducts(prev => prev.filter(product => product.id !== deletingId))
     handleCloseDeleteModal()
+    showNotification('success', `Product "${deletingItemName}" has been deleted`)
   }
 
   const filteredProducts = products.filter(product =>
