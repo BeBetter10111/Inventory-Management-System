@@ -22,6 +22,8 @@ public class TransactionDetail {
 
     private Integer quantity;
 
+    private Double priceAtTransaction;
+
     @Column(name = "unit_price")
-    private UnitPriceType unitPrice;
+    private UnitPriceType unitPriceType;
 }
