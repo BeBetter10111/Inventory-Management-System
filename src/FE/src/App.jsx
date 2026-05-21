@@ -1,9 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import Showcase from './pages/Showcase'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import ApprovalWait from './pages/ApprovalWait'
-import Dashboard from './pages/Dashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import StaffDashboard from './pages/StaffDashboard'
 import Suppliers from './pages/Suppliers'
@@ -25,7 +23,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Showcase />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/approval" element={<ApprovalWait />} />

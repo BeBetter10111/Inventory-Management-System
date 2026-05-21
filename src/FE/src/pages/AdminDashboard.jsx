@@ -11,17 +11,7 @@ export default function AdminDashboard() {
     totalProducts: 2,
     totalTransactions: 3
   }
-
-  const recentActivity = [
-    {
-      id: 'AL-1',
-      type: 'Import',
-      user: 'Alan Walker',
-      date: 'April 25, 2026',
-      description: "Alan Walker has imported product 'Laptop Dell XPS 15' into inventory"
-    }
-  ]
-
+  const [recentActivity, setRecentActivity] = useState([])
   const transactionTrendData = [30, 45, 35, 60, 50, 55]
   const importExportData = [
     [50, 35, 55, 45, 60, 40],

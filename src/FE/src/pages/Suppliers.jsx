@@ -1,31 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { supplierService } from '../services/supplierService'
 
 export default function Suppliers({ userRole = 'admin' }) {
-  const [suppliers, setSuppliers] = useState([
-    {
-      id: 'SP-1',
-      name: 'Dell Vietnam',
-      contact: '(+84)312 345 678',
-      email: 'vn_support@dell.com',
-      address: '23 Nguyen Thi Huynh Street, Ward 8, Phu Nhuan District'
-    }
-  ])
-
+  const [suppliers, setSuppliers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [notification, setNotification] = useState(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [notification, setNotification] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [deletingItemName, setDeletingItemName] = useState('')
   const [formData, setFormData] = useState({
-    name: '',
+    supplierName: '',
     contact: '',
-    email: '',
     address: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Fetch suppliers on component mount
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        setLoading(true)
+        const data = await supplierService.getAll()
+        setSuppliers(data)
+        setError(null)
+      } catch (err) {
+        setError(err.message || 'Failed to fetch suppliers')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSuppliers()
+  }, [])
 
   const showNotification = (type, message) => {
     setNotification({ type, message })
@@ -33,30 +45,29 @@ export default function Suppliers({ userRole = 'admin' }) {
   }
 
   const handleOpenAddModal = () => {
-    setFormData({ name: '', contact: '', email: '', address: '' })
+    setFormData({ supplierName: '', contact: '', address: '' })
     setIsAddModalOpen(true)
   }
 
   const handleOpenEditModal = (supplier) => {
     setFormData({
-      name: supplier.name,
+      supplierName: supplier.supplierName,
       contact: supplier.contact,
-      email: supplier.email,
       address: supplier.address
     })
-    setEditingId(supplier.id)
+    setEditingId(supplier.supplierId)
     setIsEditModalOpen(true)
   }
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false)
-    setFormData({ name: '', contact: '', email: '', address: '' })
+    setFormData({ supplierName: '', contact: '', address: '' })
   }
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false)
     setEditingId(null)
-    setFormData({ name: '', contact: '', email: '', address: '' })
+    setFormData({ supplierName: '', contact: '', address: '' })
   }
 
   const handleInputChange = (e) => {
@@ -64,38 +75,44 @@ export default function Suppliers({ userRole = 'admin' }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleAddSupplier = () => {
-    if (formData.name && formData.contact && formData.email && formData.address) {
+  const handleAddSupplier = async () => {
+    if (formData.supplierName && formData.contact && formData.address) {
       try {
-        const newSupplier = {
-          id: `SP-${suppliers.length + 1}`,
+        const newSupplier = await supplierService.create({
+          supplierId: '',
           ...formData
-        }
+        })
         setSuppliers(prev => [...prev, newSupplier])
         handleCloseAddModal()
-        showNotification('success', `Supplier "${formData.name}" has been added`)
+        showNotification('success', `Supplier "${formData.supplierName}" has been added`)
       } catch (error) {
-        showNotification('error', `Error occurred while adding supplier "${formData.name}": ${error.message}`)
+        showNotification('error', `Error occurred while adding supplier: ${error.message}`)
       }
     } else {
       showNotification('error', 'Please fill in all required fields')
     }
   }
 
-  const handleEditSupplier = () => {
-    if (formData.name && formData.contact && formData.email && formData.address) {
-      setSuppliers(prev =>
-        prev.map(supplier =>
-          supplier.id === editingId ? { ...supplier, ...formData } : supplier
+  const handleEditSupplier = async () => {
+    if (formData.supplierName && formData.contact && formData.address) {
+      try {
+        const updatedSupplier = await supplierService.update(editingId, formData)
+        setSuppliers(prev =>
+          prev.map(supplier =>
+            supplier.supplierId === editingId ? updatedSupplier : supplier
+          )
         )
-      )
-      handleCloseEditModal()
+        handleCloseEditModal()
+        showNotification('success', 'Supplier updated successfully')
+      } catch (error) {
+        showNotification('error', `Error updating supplier: ${error.message}`)
+      }
     }
   }
 
   const handleOpenDeleteModal = (supplier) => {
-    setDeletingId(supplier.id)
-    setDeletingItemName(supplier.name)
+    setDeletingId(supplier.supplierId)
+    setDeletingItemName(supplier.supplierName)
     setIsDeleteModalOpen(true)
   }
 
@@ -105,14 +122,31 @@ export default function Suppliers({ userRole = 'admin' }) {
     setDeletingItemName('')
   }
 
-  const handleConfirmDelete = () => {
-    setSuppliers(prev => prev.filter(supplier => supplier.id !== deletingId))
-    handleCloseDeleteModal()
+  const handleConfirmDelete = async () => {
+    try {
+      await supplierService.delete(deletingId)
+      setSuppliers(prev => prev.filter(supplier => supplier.supplierId !== deletingId))
+      handleCloseDeleteModal()
+      showNotification('success', `Supplier "${deletingItemName}" has been deleted`)
+    } catch (error) {
+      showNotification('error', `Error deleting supplier: ${error.message}`)
+    }
   }
 
   const filteredSuppliers = suppliers.filter(supplier =>
-    supplier.name.toLowerCase().includes(searchTerm.toLowerCase())
+    supplier.supplierName.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  if (loading) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar userRole={userRole} />
+        <main className="dashboard-main">
+          <div className="loading">Loading suppliers...</div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="dashboard-layout">
@@ -123,6 +157,10 @@ export default function Suppliers({ userRole = 'admin' }) {
           <span className="notification-icon">{notification.type === 'success' ? '✓' : '✕'}</span>
           <span className="notification-message">{notification.message}</span>
         </div>
+      )}
+
+      {error && (
+        <div className="error-message">{error}</div>
       )}
 
       <main className="dashboard-main">
@@ -162,18 +200,16 @@ export default function Suppliers({ userRole = 'admin' }) {
                   <th>#</th>
                   <th>Name</th>
                   <th>Contact</th>
-                  <th>Email</th>
                   <th>Address</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSuppliers.map((supplier) => (
-                  <tr key={supplier.id}>
-                    <td>{supplier.id}</td>
-                    <td>{supplier.name}</td>
+                  <tr key={supplier.supplierId}>
+                    <td>{supplier.supplierId}</td>
+                    <td>{supplier.supplierName}</td>
                     <td>{supplier.contact}</td>
-                    <td>{supplier.email}</td>
                     <td>{supplier.address}</td>
                     <td className="actions-cell">
                       {userRole === 'admin' && (
@@ -189,12 +225,12 @@ export default function Suppliers({ userRole = 'admin' }) {
             </table>
             {filteredSuppliers.length === 0 && (
               <div className="no-data">
-                <p>Showing 1-10 of 1 products</p>
+                <p>No suppliers found</p>
               </div>
             )}
             {filteredSuppliers.length > 0 && (
               <div className="table-footer">
-                <p>Showing 1-{filteredSuppliers.length} of {filteredSuppliers.length} products</p>
+                <p>Showing 1-{filteredSuppliers.length} of {filteredSuppliers.length} suppliers</p>
                 <div className="pagination">
                   <button className="btn-pagination" disabled>Previous</button>
                   <span className="page-number">1</span>
@@ -219,9 +255,9 @@ export default function Suppliers({ userRole = 'admin' }) {
                     <label>Supplier Name</label>
                     <input
                       type="text"
-                      name="name"
+                      name="supplierName"
                       placeholder="Your company name"
-                      value={formData.name}
+                      value={formData.supplierName}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -235,16 +271,6 @@ export default function Suppliers({ userRole = 'admin' }) {
                       onChange={handleInputChange}
                     />
                   </div>
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="companyemail@provider.com"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
                 </div>
                 <div className="form-group">
                   <label>Address</label>
@@ -279,8 +305,8 @@ export default function Suppliers({ userRole = 'admin' }) {
                     <label>Supplier Name</label>
                     <input
                       type="text"
-                      name="name"
-                      value={formData.name}
+                      name="supplierName"
+                      value={formData.supplierName}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -293,15 +319,6 @@ export default function Suppliers({ userRole = 'admin' }) {
                       onChange={handleInputChange}
                     />
                   </div>
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                  />
                 </div>
                 <div className="form-group">
                   <label>Address</label>
@@ -329,11 +346,11 @@ export default function Suppliers({ userRole = 'admin' }) {
                 <h2>Remove this supplier?</h2>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to remove supplier "{deletingItemName}"? This action is irreversible!</p>
+                <p>Are you sure you want to remove supplier "){deletingItemName}"? This action is irreversible!</p>
               </div>
               <div className="modal-footer">
                 <button className="btn-cancel" onClick={handleCloseDeleteModal}>Cancel</button>
-                <button className="btn-delete" onClick={handleConfirmDelete}>Disable</button>
+                <button className="btn-delete" onClick={handleConfirmDelete}>Delete</button>
               </div>
             </div>
           </div>

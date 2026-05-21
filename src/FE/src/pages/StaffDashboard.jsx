@@ -3,20 +3,15 @@ import Sidebar from '../components/Sidebar'
 import { LineChart, BarChart } from '../components/Charts'
 
 export default function StaffDashboard() {
-  const stats = {
-    totalProducts: 2,
-    totalTransactions: 3
-  }
 
-  const recentTransactions = [
-    {
-      id: 'TXN-1',
-      type: 'Import',
-      date: 'April 25, 2026',
-      product: 'Laptop Dell XPS 15',
-      quantity: 25
-    }
-  ]
+  //Call API to fetch stats, recent transactions, and chart data, then set the corresponding state variables with the responses
+  const stats = {
+    //Call API instead of hardcoding the value
+    totalProducts,
+    totalTransactions
+  }
+  //call API to fetch recent transactions and setRecentTransactions with the response
+  const [recentTransactions, setRecentTransactions] = useState([])
 
   const transactionTrendData = [30, 45, 35, 60, 50, 55]
   const importExportData = [

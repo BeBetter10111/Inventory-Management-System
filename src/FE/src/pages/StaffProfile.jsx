@@ -3,15 +3,7 @@ import Sidebar from '../components/Sidebar'
 
 export default function Profile({ userRole = 'staff' || 'admin' }) {
   const [isEditing, setIsEditing] = useState(false)
-  const [userProfile, setUserProfile] = useState({
-    initials: 'AW',
-    name: 'Alan Walker',
-    role: 'Staff',
-    email: 'alanwalker@gmail.com',
-    username: 'Alan Walker',
-    fullName: 'Alan Walker',
-    phoneNumber: '+12345678'
-  })
+  const [userProfile, setUserProfile] = useState({})
   const [editData, setEditData] = useState({ ...userProfile })
 
   const handleEditClick = () => {

@@ -1,27 +1,39 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { activityLogService } from '../services/activityLogService'
 
 export default function ActivityLogPage({ userRole = 'admin' }) {
-  const [activityLogs, setActivityLogs] = useState([
-    {
-      id: 'AL-1',
-      type: 'Import',
-      user: 'Alan Walker',
-      date: 'April 25, 2026',
-      description: "Alan Walker has imported product 'Laptop Dell XPS 15' into inventory"
-    }
-  ])
-
+  const [activityLogs, setActivityLogs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState('All Types')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
+  useEffect(() => {
+    const fetchActivityLogs = async () => {
+      try {
+        setLoading(true)
+        const logs = await activityLogService.getAll()
+        setActivityLogs(logs)
+        setError(null)
+      } catch (err) {
+        setError(err.message || 'Failed to fetch activity logs')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchActivityLogs()
+  }, [])
+
   const filteredLogs = activityLogs.filter(log => {
     const matchesSearch =
-      log.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      log.description.toLowerCase().includes(searchTerm.toLowerCase())
+      log.activityId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.description?.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesType = typeFilter === 'All Types' || log.type === typeFilter
 
@@ -32,7 +44,7 @@ export default function ActivityLogPage({ userRole = 'admin' }) {
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedLogs = filteredLogs.slice(startIndex, startIndex + itemsPerPage)
 
-  const types = ['All Types', 'Import', 'Export', 'Edit', 'Delete', 'Create']
+  const types = ['All Types', 'Import', 'Export', 'AdjustProduct', 'AdjustCategory', 'AdjustSupplier', 'ModifyUser']
 
   const handlePreviousPage = () => {
     setCurrentPage(prev => Math.max(1, prev - 1))
@@ -40,6 +52,17 @@ export default function ActivityLogPage({ userRole = 'admin' }) {
 
   const handleNextPage = () => {
     setCurrentPage(prev => Math.min(totalPages, prev + 1))
+  }
+
+  if (loading) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar userRole={userRole} />
+        <main className="dashboard-main">
+          <div className="loading">Loading activity logs...</div>
+        </main>
+      </div>
+    )
   }
 
   return (
@@ -90,6 +113,8 @@ export default function ActivityLogPage({ userRole = 'admin' }) {
             </div>
           </div>
 
+          {error && <div className="error-message">{error}</div>}
+
           {/* Activity Logs Table */}
           <div className="activity-table-section">
             <table className="activity-data-table">
@@ -104,15 +129,15 @@ export default function ActivityLogPage({ userRole = 'admin' }) {
               </thead>
               <tbody>
                 {paginatedLogs.map(log => (
-                  <tr key={log.id}>
-                    <td className="col-id">{log.id}</td>
+                  <tr key={log.activityId}>
+                    <td className="col-id">{log.activityId}</td>
                     <td className="col-type">
                       <span className={`activity-type activity-type-${log.type.toLowerCase()}`}>
                         {log.type}
                       </span>
                     </td>
-                    <td className="col-user">{log.user}</td>
-                    <td className="col-date">{log.date}</td>
+                    <td className="col-user">{log.user?.fullName || 'Unknown'}</td>
+                    <td className="col-date">{new Date(log.timestamp).toLocaleDateString()}</td>
                     <td className="col-description">{log.description}</td>
                   </tr>
                 ))}
@@ -128,7 +153,7 @@ export default function ActivityLogPage({ userRole = 'admin' }) {
             {/* Pagination */}
             <div className="activity-pagination">
               <span className="pagination-info">
-                Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredLogs.length)} of {filteredLogs.length} products
+                Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredLogs.length)} of {filteredLogs.length} logs
               </span>
               <div className="pagination-controls">
                 <button

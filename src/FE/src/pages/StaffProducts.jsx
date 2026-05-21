@@ -1,37 +1,53 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { productService } from '../services/productService'
+import { categoryService } from '../services/categoryService'
 
 export default function Products({ userRole = 'admin' }) {
-  const [products, setProducts] = useState([
-    {
-      id: 'SKU-0001-01',
-      productName: 'Laptop Dell XPS 15',
-      category: 'Electronic',
-      supplier: 'Dell Vietnam',
-      price: '$1,659.00',
-      stockQuantity: 25,
-      description: 'Dell XPS 15'
-    }
-  ])
-
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [suppliers, setSuppliers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [notification, setNotification] = useState(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [notification, setNotification] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [deletingItemName, setDeletingItemName] = useState('')
   const [formData, setFormData] = useState({
     productName: '',
     category: '',
-    supplier: '',
     price: '',
     stockQuantity: '',
     description: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
-  const [selectedSupplier, setSelectedSupplier] = useState('')
+
+  // Fetch products and categories on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [productsData, categoriesData] = await Promise.all([
+          productService.getAll(),
+          categoryService.getAll()
+        ])
+        setProducts(productsData)
+        setCategories(categoriesData)
+        setError(null)
+      } catch (err) {
+        setError(err.message || 'Failed to fetch data')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   const showNotification = (type, message) => {
     setNotification({ type, message })
@@ -42,7 +58,6 @@ export default function Products({ userRole = 'admin' }) {
     setFormData({
       productName: '',
       category: '',
-      supplier: '',
       price: '',
       stockQuantity: '',
       description: ''
@@ -53,13 +68,12 @@ export default function Products({ userRole = 'admin' }) {
   const handleOpenEditModal = (product) => {
     setFormData({
       productName: product.productName,
-      category: product.category,
-      supplier: product.supplier,
+      category: product.category?.categoryId || '',
       price: product.price,
       stockQuantity: product.stockQuantity,
       description: product.description
     })
-    setEditingId(product.id)
+    setEditingId(product.productId)
     setIsEditModalOpen(true)
   }
 
@@ -68,7 +82,6 @@ export default function Products({ userRole = 'admin' }) {
     setFormData({
       productName: '',
       category: '',
-      supplier: '',
       price: '',
       stockQuantity: '',
       description: ''
@@ -81,7 +94,6 @@ export default function Products({ userRole = 'admin' }) {
     setFormData({
       productName: '',
       category: '',
-      supplier: '',
       price: '',
       stockQuantity: '',
       description: ''
@@ -93,40 +105,49 @@ export default function Products({ userRole = 'admin' }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleAddProduct = () => {
-    if (formData.productName && formData.category && formData.supplier) {
+  const handleAddProduct = async () => {
+    if (formData.productName && formData.category && formData.price) {
       try {
-        const newProduct = {
-          id: `SKU-${String(products.length + 1).padStart(4, '0')}-01`,
-          ...formData
-        }
+        const newProduct = await productService.create({
+          productId: '',
+          ...formData,
+          category: { categoryId: formData.category }
+        })
         setProducts(prev => [...prev, newProduct])
         handleCloseAddModal()
         showNotification('success', `Product "${formData.productName}" has been added`)
       } catch (error) {
-        showNotification('error', `Error occurred while adding product "${formData.productName}": ${error.message}`)
+        showNotification('error', `Error adding product: ${error.message}`)
       }
     } else {
       showNotification('error', 'Please fill in all required fields')
     }
   }
 
-  const handleEditProduct = () => {
-    if (formData.productName && formData.category && formData.supplier) {
-      setProducts(prev =>
-        prev.map(product =>
-          product.id === editingId ? { ...product, ...formData } : product
+  const handleEditProduct = async () => {
+    if (formData.productName && formData.category && formData.price) {
+      try {
+        const updatedProduct = await productService.update(editingId, {
+          ...formData,
+          category: { categoryId: formData.category }
+        })
+        setProducts(prev =>
+          prev.map(product =>
+            product.productId === editingId ? updatedProduct : product
+          )
         )
-      )
-      handleCloseEditModal()
-      showNotification('success', `Product "${formData.productName}" has been updated`)
+        handleCloseEditModal()
+        showNotification('success', `Product "${formData.productName}" has been updated`)
+      } catch (error) {
+        showNotification('error', `Error updating product: ${error.message}`)
+      }
     } else {
       showNotification('error', 'Please fill in all required fields')
     }
   }
 
   const handleOpenDeleteModal = (product) => {
-    setDeletingId(product.id)
+    setDeletingId(product.productId)
     setDeletingItemName(product.productName)
     setIsDeleteModalOpen(true)
   }
@@ -137,20 +158,33 @@ export default function Products({ userRole = 'admin' }) {
     setDeletingItemName('')
   }
 
-  const handleConfirmDelete = () => {
-    setProducts(prev => prev.filter(product => product.id !== deletingId))
-    handleCloseDeleteModal()
-    showNotification('success', `Product "${deletingItemName}" has been deleted`)
+  const handleConfirmDelete = async () => {
+    try {
+      await productService.delete(deletingId)
+      setProducts(prev => prev.filter(product => product.productId !== deletingId))
+      handleCloseDeleteModal()
+      showNotification('success', `Product "${deletingItemName}" has been deleted`)
+    } catch (error) {
+      showNotification('error', `Error deleting product: ${error.message}`)
+    }
   }
 
   const filteredProducts = products.filter(product =>
-    product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.id.toLowerCase().includes(searchTerm.toLowerCase())
-  ).filter(product => !selectedCategory || product.category === selectedCategory)
-   .filter(product => !selectedSupplier || product.supplier === selectedSupplier)
+    (product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     product.productId.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (!selectedCategory || product.category?.categoryId === selectedCategory)
+  )
 
-  const categories = [...new Set(products.map(p => p.category))]
-  const suppliers = [...new Set(products.map(p => p.supplier))]
+  if (loading) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar userRole={userRole} />
+        <main className="dashboard-main">
+          <div className="loading">Loading products...</div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="dashboard-layout">

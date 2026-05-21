@@ -1,16 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { buyerService } from '../services/buyerService'
 
 export default function Buyers({ userRole = 'admin' }) {
-  const [buyers, setBuyers] = useState([
-    {
-      id: 'BR-1',
-      name: 'GearVN',
-      phoneNumber: '(+84)312 345 678',
-      email: 'gearvn@gmail.com'
-    }
-  ])
-
+  const [buyers, setBuyers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -20,10 +15,28 @@ export default function Buyers({ userRole = 'admin' }) {
   const [deletingItemName, setDeletingItemName] = useState('')
   const [formData, setFormData] = useState({
     name: '',
-    phoneNumber: '',
-    email: ''
+    address: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
+  
+  // Fetch buyers on component mount
+  useEffect(() => {
+    const fetchBuyers = async () => {
+      try {
+        setLoading(true)
+        const response = await buyerService.getAll()
+        setBuyers(response)
+        setError(null)
+      } catch (error) {
+        setError(error.message || 'Failed to fetch buyers')
+        console.error('Error fetching buyers:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBuyers()
+  }, [])
 
   const showNotification = (type, message) => {
     setNotification({ type, message })
@@ -31,29 +44,28 @@ export default function Buyers({ userRole = 'admin' }) {
   }
 
   const handleOpenAddModal = () => {
-    setFormData({ name: '', phoneNumber: '', email: '' })
+    setFormData({ name: '', address: '' })
     setIsAddModalOpen(true)
   }
 
   const handleOpenEditModal = (buyer) => {
     setFormData({
       name: buyer.name,
-      phoneNumber: buyer.phoneNumber,
-      email: buyer.email
+      address: buyer.address
     })
-    setEditingId(buyer.id)
+    setEditingId(buyer.userId)
     setIsEditModalOpen(true)
   }
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false)
-    setFormData({ name: '', phoneNumber: '', email: '' })
+    setFormData({ name: '', address: '' })
   }
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false)
     setEditingId(null)
-    setFormData({ name: '', phoneNumber: '', email: '' })
+    setFormData({ name: '', address: '' })
   }
 
   const handleInputChange = (e) => {
@@ -64,37 +76,43 @@ export default function Buyers({ userRole = 'admin' }) {
     }))
   }
 
-  const handleAddBuyer = () => {
-    if (formData.name && formData.phoneNumber && formData.email) {
+  const handleAddBuyer = async () => {
+    if (formData.name && formData.address) {
       try {
-        const newBuyer = {
-          id: `BR-${buyers.length + 1}`,
+        const newBuyer = await buyerService.create({
+          userId: '',
           ...formData
-        }
+        })
         setBuyers(prev => [...prev, newBuyer])
         handleCloseAddModal()
         showNotification('success', `Buyer "${formData.name}" has been added`)
       } catch (error) {
-        showNotification('error', `Error occurred while adding buyer "${formData.name}": ${error.message}`)
+        showNotification('error', `Error occurred while adding buyer: ${error.message}`)
       }
     } else {
       showNotification('error', 'Please fill in all required fields')
     }
   }
 
-  const handleEditBuyer = () => {
-    if (formData.name && formData.phoneNumber && formData.email) {
-      setBuyers(prev =>
-        prev.map(buyer =>
-          buyer.id === editingId ? { ...buyer, ...formData } : buyer
+  const handleEditBuyer = async () => {
+    if (formData.name && formData.address) {
+      try {
+        const updatedBuyer = await buyerService.update(editingId, formData)
+        setBuyers(prev =>
+          prev.map(buyer =>
+            buyer.userId === editingId ? updatedBuyer : buyer
+          )
         )
-      )
-      handleCloseEditModal()
+        handleCloseEditModal()
+        showNotification('success', 'Buyer updated successfully')
+      } catch (error) {
+        showNotification('error', `Error updating buyer: ${error.message}`)
+      }
     }
   }
 
   const handleOpenDeleteModal = (buyer) => {
-    setDeletingId(buyer.id)
+    setDeletingId(buyer.userId)
     setDeletingItemName(buyer.name)
     setIsDeleteModalOpen(true)
   }
@@ -105,15 +123,216 @@ export default function Buyers({ userRole = 'admin' }) {
     setDeletingItemName('')
   }
 
-  const handleConfirmDelete = () => {
-    setBuyers(prev => prev.filter(buyer => buyer.id !== deletingId))
-    handleCloseDeleteModal()
+  const handleConfirmDelete = async () => {
+    try {
+      await buyerService.delete(deletingId)
+      setBuyers(prev => prev.filter(buyer => buyer.userId !== deletingId))
+      handleCloseDeleteModal()
+      showNotification('success', `Buyer "${deletingItemName}" has been deleted`)
+    } catch (error) {
+      showNotification('error', `Error deleting buyer: ${error.message}`)
+    }
   }
 
   const filteredBuyers = buyers.filter(buyer =>
-    buyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    buyer.email.toLowerCase().includes(searchTerm.toLowerCase())
+    buyer.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  if (loading) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar userRole={userRole} />
+        <main className="dashboard-main">
+          <div className="loading">Loading buyers...</div>
+        </main>
+      </div>
+    )
+  }
+
+  return (
+    <div className="dashboard-layout">
+      <Sidebar userRole={userRole} />
+
+      {notification && (
+        <div className={`notification-toast notification-${notification.type}`}>
+          <span className="notification-icon">{notification.type === 'success' ? '✓' : '✕'}</span>
+          <span className="notification-message">{notification.message}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="error-message">{error}</div>
+      )}
+
+      <main className="dashboard-main">
+        <div className="dashboard-header">
+          <div className="header-breadcrumb">
+            <a href="#" className="breadcrumb-link">Home</a>
+            <span className="breadcrumb-separator">›</span>
+            <span>Buyers</span>
+          </div>
+          <div className="header-content">
+            <h1>Buyers</h1>
+            <p>View all registered buyers</p>
+          </div>
+        </div>
+
+        <div className="dashboard-container">
+          <div className="table-header">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="Search by code or name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            {userRole === 'admin' && (
+              <button className="btn-add" onClick={handleOpenAddModal}>
+                Add Buyer
+              </button>
+            )}
+          </div>
+
+          <div className="table-container">
+            <table className="suppliers-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Address</th>
+                  {userRole === 'admin' && <th>Actions</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredBuyers.map((buyer) => (
+                  <tr key={buyer.userId}>
+                    <td>{buyer.userId}</td>
+                    <td>{buyer.name}</td>
+                    <td>{buyer.address}</td>
+                    {userRole === 'admin' && (
+                      <td className="actions-cell">
+                        <button className="btn-edit" onClick={() => handleOpenEditModal(buyer)}>Edit</button>
+                        <button className="btn-more" onClick={() => handleOpenDeleteModal(buyer)}>•••</button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filteredBuyers.length === 0 && (
+              <div className="no-data">
+                <p>No buyers found</p>
+              </div>
+            )}
+            {filteredBuyers.length > 0 && (
+              <div className="table-footer">
+                <p>Showing 1-{filteredBuyers.length} of {filteredBuyers.length} buyers</p>
+                <div className="pagination">
+                  <button className="btn-pagination" disabled>Previous</button>
+                  <span className="page-number">1</span>
+                  <button className="btn-pagination" disabled>Next</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Add Buyer Modal */}
+        {isAddModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseAddModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Add New Buyer</h2>
+                <button className="btn-close" onClick={handleCloseAddModal}>×</button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Buyer Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Your buyer name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Address</label>
+                  <textarea
+                    name="address"
+                    placeholder="Enter address"
+                    rows="3"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseAddModal}>Cancel</button>
+                <button className="btn-submit" onClick={handleAddBuyer}>Add</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Buyer Modal */}
+        {isEditModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseEditModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Edit Buyer</h2>
+                <button className="btn-close" onClick={handleCloseEditModal}>×</button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Buyer Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Address</label>
+                  <textarea
+                    name="address"
+                    rows="3"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseEditModal}>Cancel</button>
+                <button className="btn-submit" onClick={handleEditBuyer}>Save</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Buyer Modal */}
+        {isDeleteModalOpen && (
+          <div className="modal-overlay" onClick={handleCloseDeleteModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Remove this buyer?</h2>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to remove buyer "{deletingItemName}"? This action is irreversible!</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={handleCloseDeleteModal}>Cancel</button>
+                <button className="btn-delete" onClick={handleConfirmDelete}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  )
+
 
   return (
     <div className="dashboard-layout">
@@ -320,3 +539,4 @@ export default function Buyers({ userRole = 'admin' }) {
     </div>
   )
 }
+

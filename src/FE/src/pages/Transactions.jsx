@@ -1,77 +1,48 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { transactionService } from '../services/transactionService'
+import { supplierService } from '../services/supplierService'
 
 export default function Transactions({ userRole = 'admin' }) {
-  const [transactions, setTransactions] = useState([
-    {
-      id: 'TXN-1',
-      type: 'Import',
-      date: 'April 25, 2026',
-      supplier: 'Dell Vietnam',
-      product: 'Laptop Dell XPS 15',
-      quantity: 25,
-      unitPrice: '$1,349.00',
-      estTotal: '$37,975.00',
-      items: [
-        {
-          product: 'Laptop Dell XPS 15',
-          quantity: 25,
-          unitPrice: '$1,519.00',
-          subtotal: '$37,975.00'
-        }
-      ]
-    },
-    {
-      id: 'TXN-2',
-      type: 'Export',
-      date: 'April 24, 2026',
-      supplier: 'Tech Store A',
-      product: 'Monitor LG 27"',
-      quantity: 15,
-      unitPrice: '$299.00',
-      estTotal: '$4,485.00',
-      items: [
-        {
-          product: 'Monitor LG 27"',
-          quantity: 15,
-          unitPrice: '$299.00',
-          subtotal: '$4,485.00'
-        }
-      ]
-    },
-    {
-      id: 'TXN-3',
-      type: 'Import',
-      date: 'April 23, 2026',
-      supplier: 'Apple Inc',
-      product: 'iPad Pro 12.9"',
-      quantity: 10,
-      unitPrice: '$1,099.00',
-      estTotal: '$10,990.00',
-      items: [
-        {
-          product: 'iPad Pro 12.9"',
-          quantity: 10,
-          unitPrice: '$1,099.00',
-          subtotal: '$10,990.00'
-        }
-      ]
-    }
-  ])
-
+  const [transactions, setTransactions] = useState([])
+  const [suppliers, setSuppliers] = useState(['All Suppliers'])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [typeFilter, setTypeFilter] = useState('All Type')
   const [supplierFilter, setSupplierFilter] = useState('All Suppliers')
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] = useState(null)
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const [txns, supps] = await Promise.all([
+          transactionService.getAll(),
+          supplierService.getAll()
+        ])
+        setTransactions(txns || [])
+        setSuppliers(['All Suppliers', ...supps.map(s => s.supplierName)])
+        setError(null)
+      } catch (err) {
+        setError(err.message || 'Failed to fetch transactions')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = 
-      transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.product.toLowerCase().includes(searchTerm.toLowerCase())
+      transaction.transactionId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction.supplier?.supplierName?.toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesType = typeFilter === 'All Type' || transaction.type === typeFilter
-    const matchesSupplier = supplierFilter === 'All Suppliers' || transaction.supplier === supplierFilter
+    const matchesSupplier = supplierFilter === 'All Suppliers' || transaction.supplier?.supplierName === supplierFilter
 
     return matchesSearch && matchesType && matchesSupplier
   })
@@ -81,8 +52,18 @@ export default function Transactions({ userRole = 'admin' }) {
     setIsDetailModalOpen(true)
   }
 
-  const suppliers = ['All Suppliers', 'Dell Vietnam', 'Apple Inc', 'Tech Store A']
   const types = ['All Type', 'Import', 'Export']
+
+  if (loading) {
+    return (
+      <div className="dashboard-layout">
+        <Sidebar userRole={userRole} />
+        <main className="dashboard-main">
+          <div className="loading">Loading transactions...</div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="dashboard-layout">
@@ -102,11 +83,13 @@ export default function Transactions({ userRole = 'admin' }) {
         </div>
 
         <div className="dashboard-container">
+          {error && <div className="error-message">{error}</div>}
+
           <div className="table-header">
             <div className="search-box">
               <input
                 type="text"
-                placeholder="Search by code or product..."
+                placeholder="Search by code or supplier..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -133,28 +116,24 @@ export default function Transactions({ userRole = 'admin' }) {
                   <th>Type</th>
                   <th>Date</th>
                   <th>Supplier</th>
-                  <th>Product</th>
-                  <th>Quantity</th>
-                  <th>Est. Total</th>
-                  <th>Unit Price</th>
+                  <th>Buyer</th>
+                  <th>Note</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td>{transaction.id}</td>
+                  <tr key={transaction.transactionId}>
+                    <td>{transaction.transactionId}</td>
                     <td>
                       <span className={`badge badge-${transaction.type.toLowerCase()}`}>
                         {transaction.type}
                       </span>
                     </td>
-                    <td>{transaction.date}</td>
-                    <td>{transaction.supplier}</td>
-                    <td>{transaction.product}</td>
-                    <td>{transaction.quantity}</td>
-                    <td>{transaction.estTotal}</td>
-                    <td>{transaction.unitPrice}</td>
+                    <td>{new Date(transaction.date).toLocaleDateString()}</td>
+                    <td>{transaction.supplier?.supplierName || transaction.buyerName || 'N/A'}</td>
+                    <td>{transaction.buyerName || 'N/A'}</td>
+                    <td>{transaction.note || '-'}</td>
                     <td>
                       <button 
                         className="btn-view" 
@@ -191,7 +170,7 @@ export default function Transactions({ userRole = 'admin' }) {
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setIsDetailModalOpen(false)}>
           <div className="modal-content">
             <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', textAlign: 'left', marginBottom: '20px' }}>
-              <h2 style={{ margin: 0 }}>Transaction Detail - {selectedTransaction.id}</h2>
+              <h2 style={{ margin: 0 }}>Transaction Detail - {selectedTransaction.transactionId}</h2>
               <button onClick={() => setIsDetailModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>✕</button>
             </div>
 
@@ -202,7 +181,7 @@ export default function Transactions({ userRole = 'admin' }) {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div className="detail-group">
                     <label>Transaction ID</label>
-                    <p>{selectedTransaction.id}</p>
+                    <p>{selectedTransaction.transactionId}</p>
                   </div>
                   <div className="detail-group">
                     <label>Type</label>
@@ -214,19 +193,19 @@ export default function Transactions({ userRole = 'admin' }) {
                   </div>
                   <div className="detail-group">
                     <label>Date</label>
-                    <p>{selectedTransaction.date}</p>
+                    <p>{new Date(selectedTransaction.date).toLocaleDateString()}</p>
                   </div>
                   <div className="detail-group">
                     <label>Supplier</label>
-                    <p>{selectedTransaction.supplier}</p>
+                    <p>{selectedTransaction.supplier?.supplierName || selectedTransaction.buyerName || 'N/A'}</p>
                   </div>
                   <div className="detail-group">
-                    <label>Est. Total</label>
-                    <p>{selectedTransaction.estTotal}</p>
+                    <label>Buyer</label>
+                    <p>{selectedTransaction.buyerName || 'N/A'}</p>
                   </div>
                   <div className="detail-group">
-                    <label>Unit Price</label>
-                    <p>{selectedTransaction.unitPrice}</p>
+                    <label>Note</label>
+                    <p>{selectedTransaction.note || '-'}</p>
                   </div>
                 </div>
               </div>
@@ -240,13 +219,12 @@ export default function Transactions({ userRole = 'admin' }) {
                       <th style={{ textAlign: 'left', padding: '10px 0', fontWeight: '600', color: '#6b7280', fontSize: '0.875rem' }}>Product</th>
                       <th style={{ textAlign: 'center', padding: '10px 0', fontWeight: '600', color: '#6b7280', fontSize: '0.875rem' }}>Quantity</th>
                       <th style={{ textAlign: 'right', padding: '10px 0', fontWeight: '600', color: '#6b7280', fontSize: '0.875rem' }}>Unit Price</th>
-                      <th style={{ textAlign: 'right', padding: '10px 0', fontWeight: '600', color: '#6b7280', fontSize: '0.875rem' }}>Subtotal</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedTransaction.items && selectedTransaction.items.map((item, index) => (
+                    {selectedTransaction.transactionDetails && selectedTransaction.transactionDetails.map((item, index) => (
                       <tr key={index} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                        <td style={{ padding: '12px 0', color: '#1f2937' }}>{item.product}</td>
+                        <td style={{ padding: '12px 0', color: '#1f2937' }}>{item.product?.productName || 'N/A'}</td>
                         <td style={{ textAlign: 'center', padding: '12px 0', color: '#1f2937' }}>{item.quantity}</td>
                         <td style={{ textAlign: 'right', padding: '12px 0', color: '#1f2937' }}>{item.unitPrice}</td>
                         <td style={{ textAlign: 'right', padding: '12px 0', color: '#1f2937', fontWeight: '600' }}>{item.subtotal}</td>
