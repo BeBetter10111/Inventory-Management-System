@@ -2,10 +2,12 @@ import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import Notification from '../components/Notification'
 import LogoutConfirmModal from '../components/LogoutConfirmModal'
+import ChangePasswordModal from '../components/ChangePasswordModal'
 
 export default function Settings({ userRole }) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [notification, setNotification] = useState(null)
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
 
   const handleLogoutClick = () => {
     setShowLogoutConfirm(true)
@@ -79,7 +81,7 @@ export default function Settings({ userRole }) {
                   <h4>Password</h4>
                   <p>Change your password</p>
                 </div>
-                <button className="btn-action">Change Password</button>
+                <button className="btn-action" onClick={() => setIsPasswordModalOpen(true)}>Change Password</button>
               </div>
 
               <div className="setting-item">
@@ -93,6 +95,11 @@ export default function Settings({ userRole }) {
           </div>
         </div>
       </main>
+
+      <ChangePasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+      />
     </div>
   )
 }

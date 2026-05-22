@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { productService } from '../services/productService'
 import { categoryService } from '../services/categoryService'
+import { supplierService } from '../services/supplierService'
 
 export default function Products({ userRole = 'admin' }) {
   const [products, setProducts] = useState([])
@@ -25,18 +26,21 @@ export default function Products({ userRole = 'admin' }) {
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedSupplier, setSelectedSupplier] = useState('')
 
   // Fetch products and categories on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const [productsData, categoriesData] = await Promise.all([
+        const [productsData, categoriesData, suppliersData] = await Promise.all([
           productService.getAll(),
-          categoryService.getAll()
+          categoryService.getAll(),
+          supplierService.getAll()
         ])
         setProducts(productsData)
         setCategories(categoriesData)
+        setSuppliers(suppliersData)
         setError(null)
       } catch (err) {
         setError(err.message || 'Failed to fetch data')
@@ -227,9 +231,13 @@ export default function Products({ userRole = 'admin' }) {
                 className="filter-select"
               >
                 <option value="">All Categories</option>
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
+                {categories.map((cat) => {
+                  const catId = cat?.categoryId || cat?.id || cat
+                  const catName = cat?.categoryName || cat?.name || cat
+                  return (
+                    <option key={catId} value={catId}>{catName}</option>
+                  )
+                })}
               </select>
               <select 
                 value={selectedSupplier} 
@@ -237,9 +245,13 @@ export default function Products({ userRole = 'admin' }) {
                 className="filter-select"
               >
                 <option value="">All Suppliers</option>
-                {suppliers.map(sup => (
-                  <option key={sup} value={sup}>{sup}</option>
-                ))}
+                {suppliers.map((sup) => {
+                  const supId = sup?.supplierId || sup?.id || sup
+                  const supName = sup?.supplierName || sup?.name || sup
+                  return (
+                    <option key={supId} value={supId}>{supName}</option>
+                  )
+                })}
               </select>
             </div>
             {userRole === 'admin' && (
@@ -264,23 +276,29 @@ export default function Products({ userRole = 'admin' }) {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.map((product) => (
-                  <tr key={product.id}>
-                    <td>{product.id}</td>
-                    <td>{product.productName}</td>
-                    <td>{product.category}</td>
-                    <td>{product.supplier}</td>
-                    <td>{product.price}</td>
-                    <td>{product.stockQuantity}</td>
-                    <td>{product.description}</td>
-                    {userRole === 'admin' && (
-                      <td className="actions-cell">
-                        <button className="btn-edit" onClick={() => handleOpenEditModal(product)}>Edit</button>
-                        <button className="btn-more" onClick={() => handleOpenDeleteModal(product)}>•••</button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
+                {filteredProducts.map((product) => {
+                  const productId = product.productId || product.id
+                  const productCategory = product.category?.categoryName || product.category || ''
+                  const productSupplier = product.supplier?.supplierName || product.supplier || ''
+
+                  return (
+                    <tr key={productId}>
+                      <td>{productId}</td>
+                      <td>{product.productName}</td>
+                      <td>{productCategory}</td>
+                      <td>{productSupplier}</td>
+                      <td>{product.price}</td>
+                      <td>{product.stockQuantity}</td>
+                      <td>{product.description}</td>
+                      {userRole === 'admin' && (
+                        <td className="actions-cell">
+                          <button className="btn-edit" onClick={() => handleOpenEditModal(product)}>Edit</button>
+                          <button className="btn-more" onClick={() => handleOpenDeleteModal(product)}>•••</button>
+                        </td>
+                      )}
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
             {filteredProducts.length === 0 && (

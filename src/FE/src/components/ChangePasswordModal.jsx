@@ -53,12 +53,9 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
   if (!isOpen) return null
 
   return (
-    <>
-      {/* Modal Overlay */}
-      <div className="modal-overlay" onClick={handleClose}></div>
-
+    <div className="modal-overlay" onClick={handleClose}>
       {/* Modal Content */}
-      <div className="modal-content">
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Change Password</h2>
           <p>Enter your old password below</p>
@@ -107,6 +104,6 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           <button type="button" className="btn-secondary" onClick={handleClose}>Cancel</button>
         </form>
       </div>
-    </>
+    </div>
   )
 }

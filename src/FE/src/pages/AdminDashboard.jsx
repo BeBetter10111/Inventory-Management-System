@@ -1,11 +1,8 @@
 import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
-import ChangePasswordModal from '../components/ChangePasswordModal'
 import { LineChart, BarChart } from '../components/Charts'
 
 export default function AdminDashboard() {
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
-
   const stats = {
     totalUsers: 2,
     totalProducts: 2,
@@ -36,15 +33,6 @@ export default function AdminDashboard() {
         </div>
 
         <div className="dashboard-container">
-          <div className="dashboard-top">
-            <button 
-              className="btn-change-password"
-              onClick={() => setIsPasswordModalOpen(true)}
-            >
-              Change Password
-            </button>
-          </div>
-
           {/* Stats Cards */}
           <div className="stats-grid">
             <div className="stat-card">
@@ -113,11 +101,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </main>
-
-      <ChangePasswordModal 
-        isOpen={isPasswordModalOpen} 
-        onClose={() => setIsPasswordModalOpen(false)}
-      />
     </div>
   )
 }
