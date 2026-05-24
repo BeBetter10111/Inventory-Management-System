@@ -1,6 +1,6 @@
 // src/hooks/useAuth.js
 import { useState, useCallback } from 'react';
-import { authService } from '../services/authService';
+import { authService } from '../services/authServices.js';
 
 export function useAuth() {
   const [user,    setUser]    = useState(() => authService.getCurrentUser());

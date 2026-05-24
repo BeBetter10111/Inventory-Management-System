@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -8,6 +9,8 @@ export default function Login() {
     password: '',
     rememberMe: false
   })
+
+  const auth = useAuth();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -19,9 +22,19 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // TODO: Add authentication logic
     console.log('Login attempt:', formData)
-    navigate('/dashboard')
+    const user = auth.login(formData.username, formData.password)
+
+    if (user.status === "Pending") {
+      console.log('Sign up attempt:', formData)
+      navigate('/approval')
+    } else if (user.role === "staff") {
+      console.log ('Sign up attempt: ', formData)
+      navigate('/staff')
+    } else {
+      console.log('Sign up attempt:', formData)
+      navigate('/admin')
+    }
   }
 
   return (

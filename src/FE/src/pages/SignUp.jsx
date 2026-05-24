@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { authService } from '../services/authServices'
+import { useAuth} from "../hooks/useAuth"
 
 export default function SignUp() {
   const navigate = useNavigate()
@@ -12,6 +14,7 @@ export default function SignUp() {
     confirmPassword: '',
     role: ''
   })
+  const auth = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -32,6 +35,17 @@ export default function SignUp() {
       alert('Please fill in all fields!')
       return
     }
+    
+    const payLoad = {
+      userName: formData.username,
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      pw: formData.password,
+      role: formData.role
+    }
+    auth.register(payLoad);
+    
     if (formData.role === 'staff') {
       console.log('Sign up attempt:', formData)
       navigate('/approval')
@@ -40,6 +54,7 @@ export default function SignUp() {
       console.log('Sign up attempt:', formData)
       navigate('/admin')
     }
+    
   }
 
   return (

@@ -51,7 +51,7 @@ export const authService = {
   isAuthenticated: () => !!localStorage.getItem(TOKEN_KEY),
   isAdmin:         () => JSON.parse(localStorage.getItem(USER_KEY) || 'null')?.role === 'Admin',
 
-  // ── AUTH FETCH (tự động gắn Bearer token vào mọi request) ─────────────────
+  // AUTH FETCH (tự động gắn Bearer token vào mọi request) 
   authFetch: async (url, options = {}) => {
     const token = localStorage.getItem(TOKEN_KEY);
     const res = await fetch(`${BASE_URL}${url}`, {
