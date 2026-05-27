@@ -1,29 +1,29 @@
 package iu.wadproject.ims.entity;
 
+import java.util.UUID;
+
 import iu.wadproject.ims.entity.enums.UnitPriceType;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "transaction_details")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class TransactionDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue
+    private UUID detailId;
 
     @ManyToOne
-    @JoinColumn(name = "transaction_id")
+    @JoinColumn(name = "transactionId", nullable = false)
     private Transaction transaction;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "productId", nullable = false)
     private Product product;
 
-    private Integer quantity;
+    @Column(nullable = false)
+    private Integer quantity = 0;
 
-    private Double priceAtTransaction;
-
-    @Column(name = "unit_price")
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private UnitPriceType unitPriceType;
 }

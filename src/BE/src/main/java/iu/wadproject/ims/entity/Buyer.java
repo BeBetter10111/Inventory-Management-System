@@ -1,18 +1,19 @@
 package iu.wadproject.ims.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "buyers")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Buyer {
-    @Id
-    @Column(name = "user_id")
-    private String userId;
+    @Id @GeneratedValue
+    private UUID buyerId;
 
-    @Column(name = "user_name")
-    private String userName;
+    @Column(length = 200, nullable = false)
+    private String fullName;
 
+    @Column(length = 300, nullable = false)
     private String address;
 }

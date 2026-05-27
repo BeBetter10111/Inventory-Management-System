@@ -1,5 +1,5 @@
 package iu.wadproject.ims.entity.enums;
 
 public enum StatusType {
-    Active, Pending, Disable
+    Active, Pending, Disabled
 }

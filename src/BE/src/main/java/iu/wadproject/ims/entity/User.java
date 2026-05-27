@@ -1,37 +1,38 @@
 package iu.wadproject.ims.entity;
 
+import java.util.UUID;
+
 import iu.wadproject.ims.entity.enums.RoleType;
 import iu.wadproject.ims.entity.enums.StatusType;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "users")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class User {
-    @Id
-    @Column(name = "user_id")
-    private String userId;
+    @Id @GeneratedValue
+    private UUID userId;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 100)
     private String username;
 
+    @Column(nullable = false, length = 255)
     private String password;
 
-    @Column(name = "full_name")
+    @Column(length = 200, nullable = false)
     private String fullName;
 
-    @Column(name = "phone_number")
+    @Column(length = 20, nullable = false)
     private String phoneNumber;
 
-    private String email;
+    @Column(length = 150, nullable = false)
+    private String email = null;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private StatusType statusType;
+    private StatusType statusType = StatusType.Pending;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private RoleType roleType;
+    private RoleType roleType = RoleType.Staff;
 }

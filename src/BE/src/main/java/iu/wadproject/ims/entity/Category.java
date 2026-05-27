@@ -1,18 +1,19 @@
 package iu.wadproject.ims.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "categories")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Category {
-    @Id
-    @Column(name = "category_id")
-    private String categoryId;
+    @Id @GeneratedValue
+    private UUID categoryId;
 
-    @Column(name = "category_name")
+    @Column(length = 200, nullable = false)
     private String categoryName;
 
+    @Column(length = 50, nullable = false)
     private String unit;
 }

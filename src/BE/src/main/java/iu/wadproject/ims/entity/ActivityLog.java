@@ -4,23 +4,25 @@ import iu.wadproject.ims.entity.enums.LogType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "activity_logs")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class ActivityLog {
-    @Id
-    @Column(name = "activity_id")
-    private String activityId;
+    @Id @GeneratedValue
+    private UUID activityId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    private String description;
-
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private LogType type;
 
+    @Column(nullable = false)
+    private String description;
+
+    @Column(nullable = false)
     private LocalDateTime timestamp = LocalDateTime.now();
 }

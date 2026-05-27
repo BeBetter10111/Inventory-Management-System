@@ -1,27 +1,33 @@
 package iu.wadproject.ims.entity;
 
+import java.util.List;
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "products")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Product {
-    @Id
-    @Column(name = "product_id")
-    private String productId;
+    @Id @GeneratedValue
+    private UUID productId;
 
-    @Column(name = "product_name")
+    @Column(length = 200, nullable = false)
     private String productName;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private Double price;
 
-    @Column(name = "stock_quantity")
-    private Integer stockQuantity;
+    @Column(nullable = false)
+    private Integer stockQuantity = 0;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "categoryId", nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "product")
+    private List<TransactionDetail> transactionDetails;
 }

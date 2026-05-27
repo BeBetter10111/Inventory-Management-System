@@ -1,19 +1,22 @@
 package iu.wadproject.ims.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "suppliers")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Supplier {
-    @Id
-    @Column(name = "supplier_id")
-    private String supplierId;
+    @Id @GeneratedValue
+    private UUID supplierId;
 
-    @Column(name = "supplier_name")
+    @Column(nullable = false)
     private String supplierName;
 
+    @Column(nullable = false)
     private String contact;
+
+    @Column(nullable = false)
     private String address;
 }
