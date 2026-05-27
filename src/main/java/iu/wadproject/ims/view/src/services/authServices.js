@@ -10,6 +10,7 @@ export const authService = {
     const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body:    JSON.stringify({ username, password, fullname, phoneNumber, email, role }),
     });
     const data = await res.json();
@@ -21,6 +22,7 @@ export const authService = {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body:    JSON.stringify({ username, password }),
     });
     const data = await res.json();
@@ -56,6 +58,7 @@ export const authService = {
     const token = localStorage.getItem(TOKEN_KEY);
     const res = await fetch(`${BASE_URL}${url}`, {
       ...options,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
