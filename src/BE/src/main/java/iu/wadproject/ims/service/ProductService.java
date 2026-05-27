@@ -18,12 +18,24 @@ public class ProductService {
         return repository.findAll();
     }
 
+    public Product saveProduct(Product product) {
+        return repository.save(product);
+    }
+
     public Product getProductById(UUID id) {
         return repository.findById(id).orElseThrow();
     }
 
-    public Product saveProduct(Product product) {
-        return repository.save(product);
+    public Product updateProductById(UUID id, Product detail) {
+        Product product = this.getProductById(id);
+
+        product.setCategory(detail.getCategory());
+        product.setDescription(detail.getDescription());
+        product.setPrice(detail.getPrice());
+        product.setProductName(detail.getProductName());
+        product.setStockQuantity(detail.getStockQuantity());
+        
+        return this.saveProduct(product);
     }
 
     public void deleteProductById(UUID id) {

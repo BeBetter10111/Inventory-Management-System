@@ -18,13 +18,22 @@ public class CategoryService {
         return repository.findAll();
     }
 
+    public Category saveCategory(Category category) {
+        return repository.save(category);
+    }
+
     public Category getCategoryById(UUID id) {
         return repository.findById(id).orElseThrow();
     }
 
-    public Category saveCategory(Category category) {
-        return repository.save(category);
-    }
+    public Category updateCategoryById(UUID id, Category detail) {
+        Category category = this.getCategoryById(id);
+
+        category.setCategoryName(detail.getCategoryName());
+        category.setUnit(detail.getUnit());
+
+        return this.saveCategory(category);
+    }    
 
     public void deleteCategoryById(UUID id) {
         repository.deleteById(id);

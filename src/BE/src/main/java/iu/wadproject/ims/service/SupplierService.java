@@ -17,12 +17,22 @@ public class SupplierService {
         return repository.findAll();
     }
 
+    public Supplier saveSupplier(Supplier supplier) {
+        return repository.save(supplier);
+    }
+
     public Supplier getSupplierById(UUID id) {
         return repository.findById(id).orElseThrow();
     }
 
-    public Supplier saveSupplier(Supplier supplier) {
-        return repository.save(supplier);
+    public Supplier updateSupplierById(UUID id, Supplier detail) {
+        Supplier supplier = this.getSupplierById(id);
+
+        supplier.setAddress(detail.getAddress());
+        supplier.setContact(detail.getContact());
+        supplier.setSupplierName(detail.getSupplierName());
+
+        return this.saveSupplier(supplier);
     }
 
     public void deleteSupplierById(UUID id) {

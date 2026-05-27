@@ -22,10 +22,6 @@ public class TransactionService {
         return repository.findAll();
     }
 
-    public Transaction getTransactionById(UUID id) {
-        return repository.findById(id).orElseThrow();
-    }
-
     @Transactional
     public void processTransaction(TransactionRequest request) {
         Transaction transaction = new Transaction();
@@ -53,5 +49,9 @@ public class TransactionService {
 
             transactionDetailService.saveTransactionDetail(transactionDetail);
         });
+    }
+
+    public Transaction getTransactionById(UUID id) {
+        return repository.findById(id).orElseThrow();
     }
 }

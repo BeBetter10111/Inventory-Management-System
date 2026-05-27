@@ -3,59 +3,87 @@ package iu.wadproject.ims.service;
 import iu.wadproject.ims.dto.request.LoginRequest;
 import iu.wadproject.ims.dto.request.RegisterRequest;
 import iu.wadproject.ims.entity.User;
-import iu.wadproject.ims.entity.Buyer;
-import iu.wadproject.ims.entity.enums.RoleType;
-import iu.wadproject.ims.entity.enums.StatusType;
 import iu.wadproject.ims.repository.UserRepository;
-import iu.wadproject.ims.repository.BuyerRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+
+import java.security.InvalidParameterException;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final BuyerRepository buyerRepository;
+    private final UserRepository repository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public User register(RegisterRequest request) {
+    public List<User> getAllUsers() {
+        return repository.findAll();
+    }
+
+    public User saveUser(User user) {
+        return repository.save(user);
+    }
+
+    public User registerUser(RegisterRequest request) {
         User user = new User();
-        user.setUserId(java.util.UUID.randomUUID().toString());
+
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
+
+        // IMPORTANT: Encrypt password before storing into the database!
+        user.setPassword(this.encodePassword(request.getPassword()));
+
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setRoleType(RoleType.User);
-        user.setStatusType(StatusType.Active);
-        return userRepository.save(user);
+        user.setRoleType(request.getRoleType());
+
+        return this.saveUser(user);
     }
 
-    public String authenticate(LoginRequest request) {
-        return "dummy-jwt-token";
+    public User getUserByUsername(String username) {
+        return repository.findByUsername(username).orElseThrow();
     }
 
-    public User updateProfile(User userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-        user.setFullName(userDetails.getFullName());
-        user.setPhoneNumber(userDetails.getPhoneNumber());
-        user.setEmail(userDetails.getEmail());
-        return userRepository.save(user);
+    public User authenticate(LoginRequest request) {
+        User user = this.getUserByUsername(request.getUsername());
+
+        if (!isPasswordValid(request.getPassword(), user.getPassword())) {
+            throw new InvalidParameterException("Invalid password");
+        }
+
+        return user;
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow();
+    public User updateUserByUsername(String username, User detail) {
+        User user = this.getUserByUsername(username);
+
+        user.setEmail(detail.getEmail());
+        user.setFullName(detail.getFullName());
+        user.setPhoneNumber(detail.getPhoneNumber());
+        user.setUsername(detail.getUsername());
+
+        return this.saveUser(user);
     }
 
-    public User getCurrentUser() {
-        return userRepository.findAll().stream().findFirst().orElse(null);
+    public User updatePasswordByUsername(String username, String rawPassword) {
+        User user = this.getUserByUsername(username);
+
+        user.setPassword(passwordEncoder.encode(rawPassword));
+
+        return this.saveUser(user);
     }
 
-    public List<Buyer> findAllBuyers() {
-        return buyerRepository.findAll();
+    private boolean isPasswordValid(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-    public Buyer saveBuyer(Buyer buyer) {
-        return buyerRepository.save(buyer);
+    private String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 }

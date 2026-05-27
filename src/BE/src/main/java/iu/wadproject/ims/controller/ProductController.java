@@ -3,42 +3,43 @@ package iu.wadproject.ims.controller;
 import iu.wadproject.ims.entity.Product;
 import iu.wadproject.ims.dto.response.ApiResponse;
 import iu.wadproject.ims.service.ProductService;
+
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/product")
 @RequiredArgsConstructor
 public class ProductController {
-    private final ProductService productService;
+    private final ProductService service;
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllProducts() {
-        List<Product> products = productService.findAll();
-        return ResponseEntity.ok(new ApiResponse("Success", products));
+        return ResponseEntity.ok(new ApiResponse("Success", service.getAllProducts()));
+    }
+
+    @PutMapping
+    public ResponseEntity<ApiResponse> saveProduct(@RequestBody Product product) {
+        return ResponseEntity.ok(new ApiResponse("Product saved successfully", service.saveProduct(product)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getProductById(@PathVariable String id) {
-        return ResponseEntity.ok(new ApiResponse("Success", productService.findById(id)));
+    public ResponseEntity<ApiResponse> getProductById(@RequestParam UUID id) {
+        return ResponseEntity.ok(new ApiResponse("Success", service.getProductById(id)));
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse> createProduct(@RequestBody Product product) {
-        return ResponseEntity.ok(new ApiResponse("Product created", productService.save(product)));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateProduct(@PathVariable String id, @RequestBody Product product) {
-        return ResponseEntity.ok(new ApiResponse("Product updated", productService.update(id, product)));
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse> updateProductById(@RequestParam UUID id, @RequestBody Product detail) {
+        return ResponseEntity.ok(new ApiResponse("Buyer updated successfully", service.updateProductById(id, detail)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteProduct(@PathVariable String id) {
-        productService.delete(id);
-        return ResponseEntity.ok(new ApiResponse("Product deleted", null));
+    public ResponseEntity<ApiResponse> deleteProduct(@RequestParam UUID id) {
+        service.deleteProductById(id);
+        return ResponseEntity.ok(new ApiResponse("Product deleted successfully", null));
     }
 }

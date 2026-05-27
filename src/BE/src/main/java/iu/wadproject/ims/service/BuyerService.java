@@ -18,12 +18,21 @@ public class BuyerService {
         return repository.findAll();
     }
 
+    public Buyer saveBuyer(Buyer buyer) {
+        return repository.save(buyer);
+    }
+
     public Buyer getBuyerById(UUID id) {
         return repository.findById(id).orElseThrow();
     }
 
-    public Buyer saveBuyer(Buyer buyer) {
-        return repository.save(buyer);
+    public Buyer updateBuyerById(UUID id, Buyer detail) {
+        Buyer buyer = this.getBuyerById(id);
+
+        buyer.setFullName(detail.getFullName());
+        buyer.setAddress(detail.getAddress());
+
+        return this.saveBuyer(buyer);
     }
 
     public void deleteBuyerById(UUID id) {

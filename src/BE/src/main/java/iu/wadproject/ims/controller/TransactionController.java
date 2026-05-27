@@ -3,33 +3,34 @@ package iu.wadproject.ims.controller;
 import iu.wadproject.ims.dto.request.TransactionRequest;
 import iu.wadproject.ims.dto.response.ApiResponse;
 import iu.wadproject.ims.service.TransactionService;
+
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api/transaction")
 @RequiredArgsConstructor
 public class TransactionController {
-    private final TransactionService transactionService;
+    private final TransactionService service;
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAllTransactions() {
-        return ResponseEntity.ok(new ApiResponse("Success", transactionService.findAll()));
+        return ResponseEntity.ok(new ApiResponse("Success", service.getAllTransactions()));
     }
 
-    @GetMapping("/current-user")
-    public ResponseEntity<ApiResponse> getCurrentUserTransactions() {
-        return ResponseEntity.ok(new ApiResponse("Success", transactionService.getCurrentUserTransactions()));
+    @PostMapping("/process")
+    public ResponseEntity<ApiResponse> processTransaction(@RequestBody TransactionRequest request) {
+        service.processTransaction(request);
+
+        return ResponseEntity.ok(new ApiResponse("Inventory processed successfully", null));
     }
 
-    @PostMapping("/import")
-    public ResponseEntity<ApiResponse> importInventory(@RequestBody TransactionRequest request) {
-        return ResponseEntity.ok(new ApiResponse("Inventory imported successfully", transactionService.processImport(request)));
-    }
-
-    @PostMapping("/export")
-    public ResponseEntity<ApiResponse> exportInventory(@RequestBody TransactionRequest request) {
-        return ResponseEntity.ok(new ApiResponse("Inventory exported successfully", transactionService.processExport(request)));
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getTransactionById(@RequestParam UUID id) {
+        return ResponseEntity.ok(new ApiResponse("Success", service.getTransactionById(id)));
     }
 }

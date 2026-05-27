@@ -1,25 +1,38 @@
 package iu.wadproject.ims.controller;
 
 import iu.wadproject.ims.entity.User;
+import iu.wadproject.ims.dto.request.UpdatePasswordRequest;
 import iu.wadproject.ims.dto.response.ApiResponse;
 import iu.wadproject.ims.service.UserService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
+    private final UserService service;
 
-    @GetMapping("/profile")
-    public ResponseEntity<ApiResponse> getProfile() {
-        return ResponseEntity.ok(new ApiResponse("Success", userService.getCurrentUser()));
+    @GetMapping
+    public ResponseEntity<ApiResponse> getAllUsers() {
+        return ResponseEntity.ok(new ApiResponse("Success", service.getAllUsers()));
     }
 
-    @PutMapping("/profile")
-    public ResponseEntity<ApiResponse> updateProfile(@RequestBody User user) {
-        return ResponseEntity.ok(new ApiResponse("Profile updated successfully", userService.updateProfile(user)));
+    @GetMapping("/{username}")
+    public ResponseEntity<ApiResponse> getUserByUsername(@RequestParam String username) {
+        return ResponseEntity.ok(new ApiResponse("Success", service.getUserByUsername(username)));
+    }
+
+    @PatchMapping("/{username}")
+    public ResponseEntity<ApiResponse> updateUserByUsername(@RequestParam String username, @RequestBody User detail) {
+        return ResponseEntity.ok(new ApiResponse("Buyer updated successfully", service.updateUserByUsername(username, detail)));
+    }
+
+    @PatchMapping("/update-password")
+    public ResponseEntity<ApiResponse> updatePasswordByUsername(@RequestBody UpdatePasswordRequest request) {
+        return ResponseEntity.ok(new ApiResponse("Password updated successfully", service.updatePasswordByUsername(request.getUsername(), request.getNewRawPassword())));
     }
 }
