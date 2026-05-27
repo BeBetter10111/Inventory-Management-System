@@ -6,11 +6,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class SupplierService {
     private final SupplierRepository repository;
-    public List<Supplier> findAll() { return repository.findAll(); }
-    public Supplier save(Supplier s) { return repository.save(s); }
+
+    public List<Supplier> getAllSuppliers() {
+        return repository.findAll();
+    }
+
+    public Supplier getSupplierById(UUID id) {
+        return repository.findById(id).orElseThrow();
+    }
+
+    public Supplier saveSupplier(Supplier supplier) {
+        return repository.save(supplier);
+    }
+
+    public void deleteSupplierById(UUID id) {
+        repository.deleteById(id);
+    }
 }

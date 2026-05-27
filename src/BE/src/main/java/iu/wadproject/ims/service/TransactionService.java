@@ -1,89 +1,57 @@
 package iu.wadproject.ims.service;
 
 import iu.wadproject.ims.dto.request.TransactionRequest;
-import iu.wadproject.ims.entity.Product;
-import iu.wadproject.ims.entity.Transaction;
-import iu.wadproject.ims.entity.TransactionDetail;
-import iu.wadproject.ims.entity.enums.TransactionType;
+import iu.wadproject.ims.entity.*;
 import iu.wadproject.ims.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
+
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
-    private final TransactionRepository transactionRepository;
-    private final TransactionDetailRepository detailRepository;
-    private final ProductRepository productRepository;
-    private final SupplierRepository supplierRepository;
-    private final BuyerRepository buyerRepository;
+    private final TransactionRepository repository;
 
-    public List<Transaction> findAll() {
-        return transactionRepository.findAll();
+    private final ProductService productService;
+    private final TransactionDetailService transactionDetailService;
+
+    public List<Transaction> getAllTransactions() {
+        return repository.findAll();
     }
 
-    public List<Transaction> getCurrentUserTransactions() {
-        return transactionRepository.findAll();
-    }
-
-    @Transactional
-    public Transaction processImport(TransactionRequest request) {
-        Transaction tx = new Transaction();
-        tx.setTransactionId(request.getTransactionId());
-        tx.setType(TransactionType.Import);
-        tx.setDate(LocalDateTime.now());
-        tx.setSupplier(supplierRepository.findById(request.getSupplierId()).orElse(null));
-        tx.setNote(request.getNote());
-
-        transactionRepository.save(tx);
-
-        request.getItems().forEach(item -> {
-            Product product = productRepository.findById(item.getProductId()).orElseThrow();
-            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-            productRepository.save(product);
-
-            TransactionDetail detail = new TransactionDetail();
-            detail.setTransaction(tx);
-            detail.setProduct(product);
-            detail.setQuantity(item.getQuantity());
-            detail.setPriceAtTransaction(product.getPrice());
-            detail.setUnitPriceType(item.getUnitPriceType());
-            detailRepository.save(detail);
-        });
-        return tx;
+    public Transaction getTransactionById(UUID id) {
+        return repository.findById(id).orElseThrow();
     }
 
     @Transactional
-    public Transaction processExport(TransactionRequest request) {
-        Transaction tx = new Transaction();
-        tx.setTransactionId(request.getTransactionId());
-        tx.setType(TransactionType.Export);
-        tx.setDate(LocalDateTime.now());
+    public void processTransaction(TransactionRequest request) {
+        Transaction transaction = new Transaction();
 
-        buyerRepository.findById(request.getBuyerId()).ifPresent(buyer -> tx.setBuyerName(buyer.getUserName()));
+        transaction.setType(request.getTransactionType());
+        transaction.setUser(request.getUser());
+        transaction.setSupplier(request.getSupplier());
+        transaction.setBuyer(request.getBuyer());
+        transaction.setNote(request.getNote());
 
-        tx.setNote(request.getNote());
-        transactionRepository.save(tx);
+        repository.save(transaction);
 
-        request.getItems().forEach(item -> {
-            Product product = productRepository.findById(item.getProductId()).orElseThrow();
-            if (product.getStockQuantity() < item.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for: " + product.getProductName());
-            }
-            product.setStockQuantity(product.getStockQuantity() - item.getQuantity());
-            productRepository.save(product);
+        request.getDetails().forEach(detail -> {
+            Product productInDb = productService.getProductById(detail.getProduct().getProductId());
 
-            TransactionDetail detail = new TransactionDetail();
-            detail.setTransaction(tx);
-            detail.setProduct(product);
-            detail.setQuantity(item.getQuantity());
-            detail.setPriceAtTransaction(product.getPrice());
-            detail.setUnitPriceType(item.getUnitPriceType());
-            detailRepository.save(detail);
+            productInDb.setStockQuantity(productInDb.getStockQuantity() + detail.getQuantity());
+            productService.saveProduct(productInDb);
+
+            TransactionDetail transactionDetail = new TransactionDetail();
+
+            transactionDetail.setTransaction(detail.getTransaction());
+            transactionDetail.setProduct(detail.getProduct());
+            transactionDetail.setQuantity(detail.getQuantity());
+            transactionDetail.setUnitPriceType(detail.getUnitPriceType());
+
+            transactionDetailService.saveTransactionDetail(transactionDetail);
         });
-        return tx;
     }
 }
