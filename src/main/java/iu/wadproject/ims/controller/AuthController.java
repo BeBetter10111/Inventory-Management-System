@@ -8,6 +8,7 @@ import iu.wadproject.ims.entity.enums.RoleType;
 import iu.wadproject.ims.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,9 @@ public class AuthController {
     @Autowired
     private SecurityContextRepository securityContextRepository;
 
+    @Autowired
+    private RememberMeServices rememberMeServices;
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         try {
@@ -49,6 +54,21 @@ public class AuthController {
             
             // Explicitly save the security context to the session
             securityContextRepository.saveContext(SecurityContextHolder.getContext(), httpRequest, httpResponse);
+
+            // Wrap request parameters for RememberMeServices since it does not accept raw JSON
+            HttpServletRequest wrappedRequest = new HttpServletRequestWrapper(httpRequest) {
+                @Override
+                public String getParameter(String name) {
+                    if ("rememberMe".equals(name)) {
+                        return String.valueOf(request.isRememberMe());
+                    }
+
+                    return super.getParameter(name);
+                }
+            };
+
+            // Generate the remember me cookie on success
+            rememberMeServices.loginSuccess(wrappedRequest, httpResponse, authentication);
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
@@ -75,7 +95,7 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse("Registration successful", userService.registerUser(request)));
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public ResponseEntity<ApiResponse> logout(HttpServletRequest request) {
         SecurityContextHolder.clearContext();
 

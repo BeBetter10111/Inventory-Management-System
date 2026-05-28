@@ -11,6 +11,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -61,6 +63,15 @@ public class SecurityConfig {
     }
 
     @Bean
+    public RememberMeServices rememberMeServices(CustomUserDetailsService userDetailsService) {
+        TokenBasedRememberMeServices rememberMeServices = new TokenBasedRememberMeServices("secret-remember-me-key", userDetailsService);
+
+        rememberMeServices.setParameter("rememberMe");
+        
+        return rememberMeServices;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, SecurityContextRepository securityContextRepository) throws Exception {
         http
             // Disable CSRF for REST API to accept request
@@ -78,6 +89,11 @@ public class SecurityConfig {
             
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            )
+            
+            .rememberMe(rememberMe -> rememberMe
+                .rememberMeServices(rememberMeServices(userDetailsService))
+                .rememberMeParameter("rememberMe")
             );
         
         return http.build();
