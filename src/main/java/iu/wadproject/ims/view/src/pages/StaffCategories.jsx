@@ -24,7 +24,7 @@ export default function Categories({ userRole = 'admin' }) {
     const fetchCategories = async () => {
       try {
         setLoading(true)
-        const data = await categoryService.getAll()
+        const data = await categoryService.getAllCategories()
         setCategories(data)
         setError(null)
       } catch (err) {
@@ -76,10 +76,10 @@ export default function Categories({ userRole = 'admin' }) {
   const handleAddCategory = async () => {
     if (formData.categoryName && formData.unit) {
       try {
-        const newCategory = await categoryService.create({
-          categoryId: '',
-          ...formData
-        })
+        const newCategory = await categoryService.createCategory(
+          formData.categoryName,
+          formData.unit,
+        )
         setCategories(prev => [...prev, newCategory])
         handleCloseAddModal()
         showNotification('success', `Category "${formData.categoryName}" has been added`)

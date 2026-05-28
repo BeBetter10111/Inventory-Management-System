@@ -2,7 +2,7 @@ import fetchApi from "../utils/fetchApi.js";
 
 const endpoint = "/transaction";
 
-export const supplierService = {
+export const transactionService = {
     getAllTransactions: async () => await fetchApi(endpoint, 'GET'),
 
     getTransaction: async (id) => await fetchApi(`${endpoint}/${id}`, 'GET'),

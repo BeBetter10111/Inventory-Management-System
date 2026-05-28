@@ -28,18 +28,18 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getCategoryById(@RequestParam UUID id) {
-        return ResponseEntity.ok(new ApiResponse("Success", service.getCategoryById(id)));
+    public ResponseEntity<ApiResponse> getCategoryById(@PathVariable String id) {
+        return ResponseEntity.ok(new ApiResponse("Success", service.getCategoryById(UUID.fromString(id))));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateCategoryById(@RequestParam UUID id, @RequestBody Category detail) {
-        return ResponseEntity.ok(new ApiResponse("Category updated successfully", service.updateCategoryById(id, detail)));
+    public ResponseEntity<ApiResponse> updateCategoryById(@PathVariable String id, @RequestBody Category detail) {
+        return ResponseEntity.ok(new ApiResponse("Category updated successfully", service.updateCategoryById(UUID.fromString(id), detail)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteCategory(@RequestParam UUID id) {
-        service.deleteCategoryById(id);
+    public ResponseEntity<ApiResponse> deleteCategory(@PathVariable String id) {
+        service.deleteCategoryById(UUID.fromString(id));
         return ResponseEntity.ok(new ApiResponse("Category deleted successfully", null));
     }
 }

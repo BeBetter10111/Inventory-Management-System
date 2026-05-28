@@ -2,7 +2,7 @@ import fetchApi from "../utils/fetchApi.js";
 
 const endpoint = "/user";
 
-export const supplierService = {
+export const userService = {
     getAllUsers: async () => await fetchApi(endpoint, 'GET'),
     
     getUser: async (username) => await fetchApi(`${endpoint}/${username}`, 'GET'),
@@ -16,5 +16,5 @@ export const supplierService = {
 
     updatePassword: async (newRawPassword) => await fetchApi(`${endpoint}/update-password`, {
         newRawPassword: newRawPassword,
-    })
+    }),
 };

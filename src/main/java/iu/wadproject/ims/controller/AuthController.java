@@ -101,4 +101,9 @@ public class AuthController {
 
         return ResponseEntity.ok(new ApiResponse("Logout successful", null));
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse> getCurrentUser() {
+        return ResponseEntity.ok(new ApiResponse("Success", userService.getCurrentUser()));
+    }
 }

@@ -14,5 +14,5 @@ export default async function fetchApi(endpoint, method, body = null) {
         throw new Error(data.message || `${method} ${endpoint} returned status ${response.status}`);
     }
     
-    return data;
+    return data.data;
 }

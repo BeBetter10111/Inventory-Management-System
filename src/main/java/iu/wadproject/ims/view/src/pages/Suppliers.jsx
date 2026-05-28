@@ -25,7 +25,7 @@ export default function Suppliers({ userRole = 'admin' }) {
     const fetchSuppliers = async () => {
       try {
         setLoading(true)
-        const data = await supplierService.getAll()
+        const data = await supplierService.getAllSuppliers()
         setSuppliers(data)
         setError(null)
       } catch (err) {
@@ -78,10 +78,11 @@ export default function Suppliers({ userRole = 'admin' }) {
   const handleAddSupplier = async () => {
     if (formData.supplierName && formData.contact && formData.address) {
       try {
-        const newSupplier = await supplierService.create({
-          supplierId: '',
-          ...formData
-        })
+        const newSupplier = await supplierService.createSupplier(
+          formData.supplierName,
+          formData.contact,
+          formData.address,
+        )
         setSuppliers(prev => [...prev, newSupplier])
         handleCloseAddModal()
         showNotification('success', `Supplier "${formData.supplierName}" has been added`)

@@ -19,4 +19,6 @@ export const authService = {
     }),
     
     logout: async () => await fetchApi(`${endpoint}/logout`, 'GET'),
+
+    getCurrentUser: async () => await fetchApi(`${endpoint}/me`, 'GET'),
 };
