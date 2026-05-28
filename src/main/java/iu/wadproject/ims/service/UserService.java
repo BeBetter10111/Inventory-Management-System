@@ -2,6 +2,7 @@ package iu.wadproject.ims.service;
 
 import iu.wadproject.ims.dto.request.LoginRequest;
 import iu.wadproject.ims.dto.request.RegisterRequest;
+import iu.wadproject.ims.dto.request.UpdatePasswordRequest;
 import iu.wadproject.ims.entity.User;
 import iu.wadproject.ims.repository.UserRepository;
 
@@ -73,10 +74,10 @@ public class UserService {
         return this.saveUser(user);
     }
 
-    public User updatePasswordByUsername(String username, String rawPassword) {
-        User user = this.getUserByUsername(username);
+    public User updatePassword(UpdatePasswordRequest request) {
+        User user = this.getCurrentUser();
 
-        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setPassword(passwordEncoder.encode(request.getNewRawPassword()));
 
         return this.saveUser(user);
     }

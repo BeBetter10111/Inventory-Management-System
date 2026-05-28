@@ -1,46 +1,21 @@
-import { authService } from './authServices';
+import fetchApi from "../utils/fetchApi.js";
+
+const endpoint = "/buyer";
 
 export const buyerService = {
-  getAll: async () => {
-    const res = await authService.authFetch('/api/buyers');
-    if (!res.ok) throw new Error('Failed to fetch buyers');
-    const data = await res.json();
-    return data.data || [];
-  },
+    getAllBuyers: async () => await fetchApi(endpoint, 'GET'),
 
-  getById: async (id) => {
-    const res = await authService.authFetch(`/api/buyers/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch buyer');
-    const data = await res.json();
-    return data.data;
-  },
+    createBuyer: async (fullName, address) => await fetchApi(endpoint, 'PUT', {
+        fullName: fullName,
+        address: address,
+    }),
 
-  create: async (buyer) => {
-    const res = await authService.authFetch('/api/buyers', {
-      method: 'POST',
-      body: JSON.stringify(buyer),
-    });
-    if (!res.ok) throw new Error('Failed to create buyer');
-    const data = await res.json();
-    return data.data;
-  },
+    getBuyer: async (id) => await fetchApi(`${endpoint}/${id}`, 'GET'),
 
-  update: async (id, buyer) => {
-    const res = await authService.authFetch(`/api/buyers/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(buyer),
-    });
-    if (!res.ok) throw new Error('Failed to update buyer');
-    const data = await res.json();
-    return data.data;
-  },
+    updateBuyer: async (id, fullName, address) => await fetchApi(`${endpoint}/${id}`, 'PATCH', {
+        fullName: fullName,
+        address: address,
+    }),
 
-  delete: async (id) => {
-    const res = await authService.authFetch(`/api/buyers/${id}`, {
-      method: 'DELETE',
-    });
-    if (!res.ok) throw new Error('Failed to delete buyer');
-    const data = await res.json();
-    return data.data;
-  },
+    deleteBuyer: async (id) => await fetchApi(`${endpoint}/${id}`, 'DELETE'),
 };

@@ -28,6 +28,9 @@ public class TransactionService {
     @Autowired
     private ActivityLogService activityLogService;
 
+    @Autowired
+    private UserService userService;
+
     public List<Transaction> getAllTransactions() {
         return repository.findAll();
     }
@@ -37,7 +40,7 @@ public class TransactionService {
         Transaction transaction = new Transaction();
 
         transaction.setType(request.getTransactionType());
-        transaction.setUser(request.getUser());
+        transaction.setUser(userService.getCurrentUser());
         transaction.setSupplier(request.getSupplier());
         transaction.setBuyer(request.getBuyer());
         transaction.setNote(request.getNote());
@@ -52,7 +55,7 @@ public class TransactionService {
 
             TransactionDetail transactionDetail = new TransactionDetail();
 
-            transactionDetail.setTransaction(detail.getTransaction());
+            transactionDetail.setTransaction(savedTransaction);
             transactionDetail.setProduct(detail.getProduct());
             transactionDetail.setQuantity(detail.getQuantity());
             transactionDetail.setUnitPriceType(detail.getUnitPriceType());

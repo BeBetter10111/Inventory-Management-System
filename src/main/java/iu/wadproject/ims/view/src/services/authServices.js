@@ -1,7 +1,9 @@
-const BASE_URL = 'http://localhost:8080';
+import fetchApi from "../utils/fetchApi.js";
+
+const endpoint = "/auth";
 
 export const authService = {
-    register: async (username, password, fullName, email, phoneNumber, roleType) => await fetchApi('/auth/register', 'POST', {
+    register: async (username, password, fullName, email, phoneNumber, roleType) => await fetchApi(`${endpoint}/register`, 'POST', {
         username: username,
         password: password,
         fullName: fullName,
@@ -10,28 +12,11 @@ export const authService = {
         roleType: roleType,
     }),
 
-    login: async (username, password, rememberMe) => await fetchApi('/auth/login', 'POST', {
+    login: async (username, password, rememberMe) => await fetchApi(`${endpoint}/login`, 'POST', {
         username: username,
         password: password,
         rememberMe: rememberMe,
     }),
     
-    logout: async () => await fetchApi('/auth/logout', 'GET'),
+    logout: async () => await fetchApi(`${endpoint}/logout`, 'GET'),
 };
-
-async function fetchApi(endpoint, method, body = null) {
-    const response = await fetch(`${BASE_URL}/api${endpoint}`, {
-        method: method,
-        headers: { 'Content-Type': 'application/json', },
-        credentials: 'include', // Attach session to every request
-        body: body ? JSON.stringify(body) : null,
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-        throw new Error(data.message || `${method} ${endpoint} returned status ${response.status}`);
-    }
-    
-    return data;
-}

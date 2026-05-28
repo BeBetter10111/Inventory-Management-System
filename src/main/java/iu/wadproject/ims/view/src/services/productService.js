@@ -1,48 +1,27 @@
-import { authService } from './authServices';
+import fetchApi from "../utils/fetchApi.js";
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const endpoint = "/product";
 
 export const productService = {
-  getAll: async () => {
-    const res = await authService.authFetch('/api/products');
-    if (!res.ok) throw new Error('Failed to fetch products');
-    const data = await res.json();
-    return data.data || [];
-  },
+    getAllProducts: async () => await fetchApi(endpoint, 'GET'),
+    
+    createProduct: async (productName, description, price, stockQuantity, category) => await fetchApi(endpoint, 'PUT', {
+        productName: productName,
+        description: description,
+        price: price,
+        stockQuantity: stockQuantity,
+        category: category,
+    }),
 
-  getById: async (id) => {
-    const res = await authService.authFetch(`/api/products/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch product');
-    const data = await res.json();
-    return data.data;
-  },
+    getProduct: async (id) => await fetchApi(`${endpoint}/${id}`, 'GET'),
 
-  create: async (product) => {
-    const res = await authService.authFetch('/api/products', {
-      method: 'POST',
-      body: JSON.stringify(product),
-    });
-    if (!res.ok) throw new Error('Failed to create product');
-    const data = await res.json();
-    return data.data;
-  },
+    updateProduct: async (id, productName, description, price, stockQuantity, category) => await fetchApi(`${endpoint}/${id}`, 'PATCH', {
+        productName: productName,
+        description: description,
+        price: price,
+        stockQuantity: stockQuantity,
+        category: category,
+    }),
 
-  update: async (id, product) => {
-    const res = await authService.authFetch(`/api/products/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(product),
-    });
-    if (!res.ok) throw new Error('Failed to update product');
-    const data = await res.json();
-    return data.data;
-  },
-
-  delete: async (id) => {
-    const res = await authService.authFetch(`/api/products/${id}`, {
-      method: 'DELETE',
-    });
-    if (!res.ok) throw new Error('Failed to delete product');
-    const data = await res.json();
-    return data.data;
-  },
+    deleteProduct: async (id) => await fetchApi(`${endpoint}/${id}`, 'DELETE'),
 };

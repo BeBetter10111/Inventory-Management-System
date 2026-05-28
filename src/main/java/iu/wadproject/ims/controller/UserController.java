@@ -28,11 +28,11 @@ public class UserController {
 
     @PatchMapping("/{username}")
     public ResponseEntity<ApiResponse> updateUserByUsername(@RequestParam String username, @RequestBody User detail) {
-        return ResponseEntity.ok(new ApiResponse("Buyer updated successfully", service.updateUserByUsername(username, detail)));
+        return ResponseEntity.ok(new ApiResponse("User updated successfully", service.updateUserByUsername(username, detail)));
     }
 
     @PatchMapping("/update-password")
     public ResponseEntity<ApiResponse> updatePasswordByUsername(@RequestBody UpdatePasswordRequest request) {
-        return ResponseEntity.ok(new ApiResponse("Password updated successfully", service.updatePasswordByUsername(request.getUsername(), request.getNewRawPassword())));
+        return ResponseEntity.ok(new ApiResponse("Password updated successfully", service.updatePassword(request)));
     }
 }

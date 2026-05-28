@@ -1,46 +1,23 @@
-import { authService } from './authServices';
+import fetchApi from "../utils/fetchApi.js";
+
+const endpoint = "/supplier"
 
 export const supplierService = {
-  getAll: async () => {
-    const res = await authService.authFetch('/api/suppliers');
-    if (!res.ok) throw new Error('Failed to fetch suppliers');
-    const data = await res.json();
-    return data.data || [];
-  },
+    getAllSuppliers: async () => await fetchApi(endpoint, 'GET'),
+    
+    createSupplier: async (supplierName, contact, address) => await fetchApi(endpoint, 'PUT', {
+        supplierName: supplierName,
+        contact: contact,
+        address: address,
+    }),
 
-  getById: async (id) => {
-    const res = await authService.authFetch(`/api/suppliers/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch supplier');
-    const data = await res.json();
-    return data.data;
-  },
+    getSupplier: async (id) => await fetchApi(`${endpoint}/${id}`, 'GET'),
 
-  create: async (supplier) => {
-    const res = await authService.authFetch('/api/suppliers', {
-      method: 'POST',
-      body: JSON.stringify(supplier),
-    });
-    if (!res.ok) throw new Error('Failed to create supplier');
-    const data = await res.json();
-    return data.data;
-  },
+    updateSupplier: async (id, supplierName, contact, address) => await fetchApi(`${endpoint}/${id}`, 'PATCH', {
+        supplierName: supplierName,
+        contact: contact,
+        address: address,
+    }),
 
-  update: async (id, supplier) => {
-    const res = await authService.authFetch(`/api/suppliers/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(supplier),
-    });
-    if (!res.ok) throw new Error('Failed to update supplier');
-    const data = await res.json();
-    return data.data;
-  },
-
-  delete: async (id) => {
-    const res = await authService.authFetch(`/api/suppliers/${id}`, {
-      method: 'DELETE',
-    });
-    if (!res.ok) throw new Error('Failed to delete supplier');
-    const data = await res.json();
-    return data.data;
-  },
+    deleteSupplier: async (id) => await fetchApi(`${endpoint}/${id}`, 'DELETE'),
 };
