@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Server",
+            "request": "launch",
+            "mainClass": "iu.wadproject.ims.ImsApplication",
+            "projectName": "ims"
+        },
+        {
+            "type": "node",
+            "name": "Client",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/main/java/iu/wadproject/ims/view/node_modules/.bin/vite",
+            "cwd": "${workspaceFolder}/src/main/java/iu/wadproject/ims/view",
+            "skipFiles": [
+                "node_modules/**"
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Full Stack",
+            "configurations": [
+                "Server",
+                "Client"
+            ],
+            "stopAll": true
+        }
+    ]
+}
