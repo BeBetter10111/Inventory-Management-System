@@ -1,17 +1,12 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-export default function ProtectedRoute({ children, requiredRole }) {
-  const location = useLocation();
-  const user     = authService.getCurrentUser();
+export default function ProtectedRoute({ children }) {
+  const auth = useAuth();
 
-  if (!authService.isAuthenticated()) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!auth.authed) {
+    return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/approval" replace />;
-  }
-
-  return children;
+  return <Outlet />;
 }
