@@ -4,7 +4,7 @@ public enum LogType {
     AdjustSupplier,
     AdjustCategory,
     AdjustProduct,
+    AdjustBuyer,
     ModifyUser,
-    Import,
-    Export
+    Transaction
 }

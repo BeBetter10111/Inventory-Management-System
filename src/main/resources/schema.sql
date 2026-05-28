@@ -6,7 +6,7 @@ CREATE TABLE `activity_log` (
     `activity_id` BINARY(16) NOT NULL,
     `description` VARCHAR(255) NOT NULL,
     `timestamp` DATETIME(6) NOT NULL,
-    `type` ENUM('AdjustCategory', 'AdjustProduct', 'AdjustSupplier', 'Export', 'Import', 'ModifyUser') NOT NULL,
+    `type` ENUM('AdjustCategory', 'AdjustProduct', 'AdjustSupplier', 'AdjustBuyer', 'ModifyUser', 'Transaction') NOT NULL,
     `user_id` BINARY(16) NOT NULL,
 
     PRIMARY KEY (`activity_id`),

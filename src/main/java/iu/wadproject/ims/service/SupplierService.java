@@ -1,8 +1,11 @@
 package iu.wadproject.ims.service;
 
 import iu.wadproject.ims.entity.Supplier;
+import iu.wadproject.ims.entity.enums.LogType;
 import iu.wadproject.ims.repository.SupplierRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,11 +16,19 @@ import java.util.UUID;
 public class SupplierService {
     private final SupplierRepository repository;
 
+    @Autowired
+    private ActivityLogService activityLogService;
+
     public List<Supplier> getAllSuppliers() {
         return repository.findAll();
     }
 
     public Supplier saveSupplier(Supplier supplier) {
+        activityLogService.saveLog(
+            LogType.AdjustProduct,
+            "added Supplier \"" + supplier.getSupplierName() + "\""
+        );
+
         return repository.save(supplier);
     }
 

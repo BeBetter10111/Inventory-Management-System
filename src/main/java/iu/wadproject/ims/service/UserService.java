@@ -11,6 +11,8 @@ import java.security.InvalidParameterException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +79,17 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(rawPassword));
 
         return this.saveUser(user);
+    }
+
+    public User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+            return this.getUserByUsername(username);
+        }
+
+        throw new InvalidParameterException("No authenticated user found");
     }
 
     private boolean isPasswordValid(String rawPassword, String encodedPassword) {
