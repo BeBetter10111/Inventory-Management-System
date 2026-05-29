@@ -28,18 +28,18 @@ public class BuyerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getBuyerById(@RequestParam UUID id) {
-        return ResponseEntity.ok(new ApiResponse("Success", service.getBuyerById(id)));
+    public ResponseEntity<ApiResponse> getBuyerById(@RequestParam String id) {
+        return ResponseEntity.ok(new ApiResponse("Success", service.getBuyerById(UUID.fromString(id))));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateBuyerById(@RequestParam UUID id, @RequestBody Buyer detail) {
-        return ResponseEntity.ok(new ApiResponse("Buyer updated successfully", service.updateBuyerById(id, detail)));
+    public ResponseEntity<ApiResponse> updateBuyerById(@RequestParam String id, @RequestBody Buyer detail) {
+        return ResponseEntity.ok(new ApiResponse("Buyer updated successfully", service.updateBuyerById(UUID.fromString(id), detail)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteBuyer(@RequestParam UUID id) {
-        service.deleteBuyerById(id);
+    public ResponseEntity<ApiResponse> deleteBuyer(@RequestParam String id) {
+        service.deleteBuyerById(UUID.fromString(id));
         return ResponseEntity.ok(new ApiResponse("Buyer deleted successfully", null));
     }
 }

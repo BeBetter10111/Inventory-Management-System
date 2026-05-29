@@ -1214,9 +1214,12 @@ a:hover {
   letter-spacing: 0.5px;
 }
 
+.suppliers-table tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
 .suppliers-table td {
   padding: 15px;
-  border-bottom: 1px solid var(--border-color);
   color: var(--text-light);
   font-size: 0.95rem;
 }

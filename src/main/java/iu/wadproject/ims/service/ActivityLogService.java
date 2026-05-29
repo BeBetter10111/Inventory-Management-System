@@ -28,7 +28,7 @@ public class ActivityLogService {
 
         log.setUser(userService.getCurrentUser());
         log.setDescription(
-            userService.getCurrentUser().getFullName() + "has " + description + "."
+            userService.getCurrentUser().getFullName() + " has " + description + "."
         );
         log.setType(type);
 

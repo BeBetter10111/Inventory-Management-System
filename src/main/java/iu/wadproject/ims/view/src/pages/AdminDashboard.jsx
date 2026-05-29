@@ -4,6 +4,8 @@ import { LineChart, BarChart } from "../components/Charts";
 import { userService } from "../services/userService.js";
 import { productService } from "../services/productService.js";
 import { transactionService } from "../services/transactionService.js";
+import { activityLogService } from "../services/activityLogService.js";
+import { Link } from "react-router-dom";
 
 export default function AdminDashboard() {
   const [totalUsers, setTotalUsers] = useState(0);
@@ -13,19 +15,21 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [tus, tps, tts] = await Promise.all([
+      const [tus, tps, tts, rats] = await Promise.all([
         userService.getAllUsers(),
         productService.getAllProducts(),
         transactionService.getAllTransactions(),
+        activityLogService.getAllLogs(),
       ]);
 
       setTotalUsers(tus.length || 0);
       setTotalProducts(tps.length || 0);
       setTotalTransactions(tts.length || 0);
+      setRecentActivity(rats || []);
     };
 
     fetchData();
-  }, [totalUsers, totalProducts, totalTransactions]);
+  }, []);
 
   const transactionTrendData = [30, 45, 35, 60, 50, 55];
 
@@ -101,9 +105,7 @@ export default function AdminDashboard() {
           <div className="activity-section">
             <div className="activity-header">
               <h2>Recent Activity</h2>
-              <a href="#" className="view-more">
-                View more
-              </a>
+              <Link to={"/admin/activity-logs"} className="view-more">View more</Link>
             </div>
 
             <table className="activity-table">
@@ -119,13 +121,11 @@ export default function AdminDashboard() {
 
               <tbody>
                 {recentActivity.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.id}</td>
-                    <td>
-                      <span className="badge">{item.type}</span>
-                    </td>
-                    <td>{item.user}</td>
-                    <td>{item.date}</td>
+                  <tr key={item.activityId}>
+                    <td>{item.activityId}</td>
+                    <td>{item.type}</td>
+                    <td>{item.user.fullName}</td>
+                    <td>{new Date(`${item.timestamp}`).toDateString()}</td>
                     <td>{item.description}</td>
                   </tr>
                 ))}

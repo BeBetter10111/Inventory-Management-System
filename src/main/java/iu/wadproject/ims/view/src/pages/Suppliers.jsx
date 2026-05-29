@@ -97,7 +97,7 @@ export default function Suppliers({ userRole = 'admin' }) {
   const handleEditSupplier = async () => {
     if (formData.supplierName && formData.contact && formData.address) {
       try {
-        const updatedSupplier = await supplierService.update(editingId, formData)
+        const updatedSupplier = await supplierService.updateSupplier(editingId, formData.supplierName, formData.contact, formData.address);
         setSuppliers(prev =>
           prev.map(supplier =>
             supplier.supplierId === editingId ? updatedSupplier : supplier
@@ -125,7 +125,7 @@ export default function Suppliers({ userRole = 'admin' }) {
 
   const handleConfirmDelete = async () => {
     try {
-      await supplierService.delete(deletingId)
+      await supplierService.deleteSupplier(deletingId)
       setSuppliers(prev => prev.filter(supplier => supplier.supplierId !== deletingId))
       handleCloseDeleteModal()
       showNotification('success', `Supplier "${deletingItemName}" has been deleted`)

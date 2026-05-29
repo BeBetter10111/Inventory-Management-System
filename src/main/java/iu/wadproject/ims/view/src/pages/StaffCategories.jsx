@@ -94,7 +94,7 @@ export default function Categories({ userRole = 'admin' }) {
   const handleEditCategory = async () => {
     if (formData.categoryName && formData.unit) {
       try {
-        const updatedCategory = await categoryService.update(editingId, formData)
+        const updatedCategory = await categoryService.updateCategory(editingId, formData.categoryName, formData.unit);
         setCategories(prev =>
           prev.map(category =>
             category.categoryId === editingId ? updatedCategory : category
@@ -122,7 +122,7 @@ export default function Categories({ userRole = 'admin' }) {
 
   const handleConfirmDelete = async () => {
     try {
-      await categoryService.delete(deletingId)
+      await categoryService.deleteCategory(deletingId)
       setCategories(prev => prev.filter(category => category.categoryId !== deletingId))
       handleCloseDeleteModal()
       showNotification('success', `Category "${deletingItemName}" has been deleted`)

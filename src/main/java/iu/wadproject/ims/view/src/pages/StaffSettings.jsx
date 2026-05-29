@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar'
 import Notification from '../components/Notification'
 import LogoutConfirmModal from '../components/LogoutConfirmModal'
 import ChangePasswordModal from '../components/ChangePasswordModal'
+import { authService } from '../services/authServices.js';
 
 export default function Settings({ userRole }) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
@@ -13,19 +14,15 @@ export default function Settings({ userRole }) {
     setShowLogoutConfirm(true)
   }
 
-  const handleConfirmLogout = () => {
+  const handleConfirmLogout = async () => {
     setShowLogoutConfirm(false)
     setNotification({ type: 'success', message: 'You have been logged out successfully!' })
     
-    // Clear any authentication tokens or user data
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('app_token')
-    localStorage.removeItem('app_user')
-    sessionStorage.removeItem('userData')
+    await authService.logout();
     
     setTimeout(() => {
       window.location.href = '/login'
-    }, 1500)
+    }, 1000)
   }
 
   const handleCancelLogout = () => {

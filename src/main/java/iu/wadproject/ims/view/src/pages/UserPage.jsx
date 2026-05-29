@@ -1,16 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
+import { userService } from '../services/userService.js';
 
 export default function UserPage({ userRole = 'admin' }) {
-  const [users, setUsers] = useState([
-    {
-      id: 'JD',
-      fullName: 'John Doe',
-      email: 'johndoe@gmail.com',
-      role: 'Admin',
-      status: 'Active'
-    }
-  ])
+  const [users, setUsers] = useState([])
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -34,6 +27,16 @@ export default function UserPage({ userRole = 'admin' }) {
   const [statusFilter, setStatusFilter] = useState('All Status')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const users = await userService.getAllUsers();
+
+      setUsers(users || []);
+    }
+
+    fetchUsers();
+  }, [])
 
   const handleOpenAddModal = () => {
     setFormData({ fullName: '', email: '', role: 'Staff', status: 'Active' })
@@ -303,15 +306,14 @@ export default function UserPage({ userRole = 'admin' }) {
                     </td>
                     <td className="col-fullname">
                       <div className="user-name-cell">
-                        <span className="user-id-badge">{user.id}</span>
                         <span className="user-name">{user.fullName}</span>
                       </div>
                     </td>
                     <td className="col-email">{user.email}</td>
-                    <td className="col-role">{user.role}</td>
+                    <td className="col-role">{user.roleType}</td>
                     <td className="col-status">
-                      <span className={`status-badge status-${user.status.toLowerCase()}`}>
-                        {user.status}
+                      <span className={`status-badge status-${user.statusType.toLowerCase()}`}>
+                        {user.statusType}
                       </span>
                     </td>
                     <td className="col-actions">
@@ -515,7 +517,7 @@ export default function UserPage({ userRole = 'admin' }) {
               
               <div className="profile-card-header">
                 <h3>{viewingUser.fullName}</h3>
-                <span className={`profile-badge profile-badge-${viewingUser.status.toLowerCase()}`}>
+                <span className={`profile-badge profile-badge-${viewingUser.statusType.toLowerCase()}`}>
                   {viewingUser.status}
                 </span>
                 {viewingUser.role && <span className="profile-role-badge">{viewingUser.role}</span>}

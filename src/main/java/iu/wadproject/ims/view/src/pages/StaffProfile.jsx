@@ -1,10 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
+import { authService } from '../services/authServices.js';
 
 export default function Profile({ userRole = 'staff' || 'admin' }) {
   const [isEditing, setIsEditing] = useState(false)
   const [userProfile, setUserProfile] = useState({})
   const [editData, setEditData] = useState({ ...userProfile })
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const profile = await authService.getCurrentUser();
+
+      setUserProfile(profile || {});
+    }
+
+    fetchUserProfile();
+  }, [])
 
   const handleEditClick = () => {
     setEditData({ ...userProfile })
@@ -50,10 +61,10 @@ export default function Profile({ userRole = 'staff' || 'admin' }) {
           {/* Profile Header */}
           <div className="profile-header">
             <div className="profile-info">
-              <div className="profile-avatar">{userProfile.initials}</div>
+              {/* <div className="profile-avatar">{userProfile.initials}</div> */}
               <div className="profile-details">
-                <h2>{userProfile.name}</h2>
-                <p className="profile-role">{userProfile.role}</p>
+                <h2>{userProfile.fullName}</h2>
+                <p className="profile-role">{userProfile.roleType}</p>
                 <p className="profile-email">{userProfile.email}</p>
               </div>
             </div>

@@ -15,7 +15,7 @@ export default function ActivityLogPage({ userRole = 'admin' }) {
     const fetchActivityLogs = async () => {
       try {
         setLoading(true)
-        const logs = await activityLogService.getAll()
+        const logs = await activityLogService.getAllLogs()
         setActivityLogs(logs)
         setError(null)
       } catch (err) {

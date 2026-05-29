@@ -14,7 +14,7 @@ export default function Buyers({ userRole = 'admin' }) {
   const [deletingId, setDeletingId] = useState(null)
   const [deletingItemName, setDeletingItemName] = useState('')
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     address: ''
   })
   const [searchTerm, setSearchTerm] = useState('')
@@ -24,7 +24,7 @@ export default function Buyers({ userRole = 'admin' }) {
     const fetchBuyers = async () => {
       try {
         setLoading(true)
-        const response = await buyerService.getAll()
+        const response = await buyerService.getAllBuyers()
         setBuyers(response)
         setError(null)
       } catch (error) {
@@ -44,28 +44,28 @@ export default function Buyers({ userRole = 'admin' }) {
   }
 
   const handleOpenAddModal = () => {
-    setFormData({ name: '', address: '' })
+    setFormData({ fullName: '', address: '' })
     setIsAddModalOpen(true)
   }
 
   const handleOpenEditModal = (buyer) => {
     setFormData({
-      name: buyer.name,
+      fullName: buyer.fullName,
       address: buyer.address
     })
-    setEditingId(buyer.userId)
+    setEditingId(buyer.buyerId)
     setIsEditModalOpen(true)
   }
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false)
-    setFormData({ name: '', address: '' })
+    setFormData({ fullName: '', address: '' })
   }
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false)
     setEditingId(null)
-    setFormData({ name: '', address: '' })
+    setFormData({ fullName: '', address: '' })
   }
 
   const handleInputChange = (e) => {
@@ -77,15 +77,14 @@ export default function Buyers({ userRole = 'admin' }) {
   }
 
   const handleAddBuyer = async () => {
-    if (formData.name && formData.address) {
+    if (formData.fullName && formData.address) {
       try {
-        const newBuyer = await buyerService.create({
-          userId: '',
-          ...formData
-        })
+        const newBuyer = await buyerService.createBuyer(formData.fullName, formData.address);
+
         setBuyers(prev => [...prev, newBuyer])
+
         handleCloseAddModal()
-        showNotification('success', `Buyer "${formData.name}" has been added`)
+        showNotification('success', `Buyer "${formData.fullName}" has been added`)
       } catch (error) {
         showNotification('error', `Error occurred while adding buyer: ${error.message}`)
       }
@@ -95,12 +94,13 @@ export default function Buyers({ userRole = 'admin' }) {
   }
 
   const handleEditBuyer = async () => {
-    if (formData.name && formData.address) {
+    if (formData.fullName && formData.address) {
       try {
-        const updatedBuyer = await buyerService.update(editingId, formData)
+        const updatedBuyer = await buyerService.updateBuyer(editingId, formData.fullName, formData.address);
+
         setBuyers(prev =>
           prev.map(buyer =>
-            buyer.userId === editingId ? updatedBuyer : buyer
+            buyer.buyerId === editingId ? updatedBuyer : buyer
           )
         )
         handleCloseEditModal()
@@ -112,8 +112,8 @@ export default function Buyers({ userRole = 'admin' }) {
   }
 
   const handleOpenDeleteModal = (buyer) => {
-    setDeletingId(buyer.userId)
-    setDeletingItemName(buyer.name)
+    setDeletingId(buyer.buyerId)
+    setDeletingItemName(buyer.fullName)
     setIsDeleteModalOpen(true)
   }
 
@@ -125,8 +125,8 @@ export default function Buyers({ userRole = 'admin' }) {
 
   const handleConfirmDelete = async () => {
     try {
-      await buyerService.delete(deletingId)
-      setBuyers(prev => prev.filter(buyer => buyer.userId !== deletingId))
+      await buyerService.deleteBuyer(deletingId)
+      setBuyers(prev => prev.filter(buyer => buyer.buyerId !== deletingId))
       handleCloseDeleteModal()
       showNotification('success', `Buyer "${deletingItemName}" has been deleted`)
     } catch (error) {
@@ -135,7 +135,7 @@ export default function Buyers({ userRole = 'admin' }) {
   }
 
   const filteredBuyers = buyers.filter(buyer =>
-    buyer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    buyer.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (loading) {
@@ -206,9 +206,9 @@ export default function Buyers({ userRole = 'admin' }) {
               </thead>
               <tbody>
                 {filteredBuyers.map((buyer) => (
-                  <tr key={buyer.userId}>
-                    <td>{buyer.userId}</td>
-                    <td>{buyer.name}</td>
+                  <tr key={buyer.buyerId}>
+                    <td>{buyer.buyerId}</td>
+                    <td>{buyer.fullName}</td>
                     <td>{buyer.address}</td>
                     {userRole === 'admin' && (
                       <td className="actions-cell">
@@ -251,9 +251,9 @@ export default function Buyers({ userRole = 'admin' }) {
                   <label>Buyer Name</label>
                   <input
                     type="text"
-                    name="name"
+                    name="fullName"
                     placeholder="Your buyer name"
-                    value={formData.name}
+                    value={formData.fullName}
                     onChange={handleInputChange}
                   />
                 </div>

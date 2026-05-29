@@ -284,7 +284,7 @@ export default function Products({ userRole = "admin" }) {
           </div>
 
           <div className="table-container">
-            <table className="products-table">
+            <table className="suppliers-table">
               <thead>
                 <tr>
                   <th>#</th>
@@ -454,12 +454,9 @@ export default function Products({ userRole = "admin" }) {
                 <div className="form-row">
                   <div className="form-group">
                     <label>Category</label>
-                    <input
-                      type="text"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                    />
+                    <select name="category" id="category" onChange={handleInputChange}>
+                      {categoryOptions()}
+                    </select>
                   </div>
                 </div>
                 <div className="form-row">
@@ -522,7 +519,7 @@ export default function Products({ userRole = "admin" }) {
                   Cancel
                 </button>
                 <button className="btn-delete" onClick={handleConfirmDelete}>
-                  Disable
+                  Delete
                 </button>
               </div>
             </div>
