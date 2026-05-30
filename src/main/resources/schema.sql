@@ -1,18 +1,22 @@
+DROP DATABASE IF EXISTS `inventory_management_system`;
 CREATE DATABASE `inventory_management_system`;
 
 USE `inventory_management_system`;
 
 CREATE TABLE `user` (
-    `user_id` BINARY(16) UNIQUE NOT NULL,
-    `email` VARCHAR(150) UNIQUE NOT NULL,
+    `user_id` BINARY(16) NOT NULL,
+    `email` VARCHAR(150) NOT NULL,
     `full_name` VARCHAR(200) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `phone_number` VARCHAR(20) UNIQUE NOT NULL,
+    `phone_number` VARCHAR(20) NOT NULL,
     `role_type` ENUM('Admin', 'Staff') NOT NULL,
     `status_type` ENUM('Active', 'Disabled', 'Pending') NOT NULL,
-    `username` VARCHAR(100) UNIQUE NOT NULL,
+    `username` VARCHAR(100) NOT NULL,
 
     PRIMARY KEY (`user_id`),
+    UNIQUE (`email`),
+    UNIQUE (`phone_number`),
+    UNIQUE (`username`)
 );
 
 CREATE TABLE `activity_log` (
@@ -52,8 +56,8 @@ CREATE TABLE `product` (
     `category_id` BINARY(16) NOT NULL,
 
     PRIMARY KEY (`product_id`),
-    FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
-    UNIQUE KEY `unique_product_in_category` (`product_name`, `category_id`)
+    FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`),
+    UNIQUE KEY (`product_name`, `category_id`)
 );
 
 CREATE TABLE `supplier` (
