@@ -4,6 +4,7 @@ import iu.wadproject.ims.dto.request.LoginRequest;
 import iu.wadproject.ims.dto.request.RegisterRequest;
 import iu.wadproject.ims.dto.request.UpdatePasswordRequest;
 import iu.wadproject.ims.entity.User;
+import iu.wadproject.ims.entity.enums.LogType;
 import iu.wadproject.ims.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,9 @@ public class UserService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
     public List<User> getAllUsers() {
         return repository.findAll();
@@ -70,6 +74,9 @@ public class UserService {
         user.setFullName(detail.getFullName());
         user.setPhoneNumber(detail.getPhoneNumber());
         user.setUsername(detail.getUsername());
+        user.setStatusType(detail.getStatusType());
+
+        this.saveLog("updated", user);
 
         return this.saveUser(user);
     }
@@ -78,6 +85,8 @@ public class UserService {
         User user = this.getCurrentUser();
 
         user.setPassword(passwordEncoder.encode(request.getNewRawPassword()));
+
+        this.saveLog("updated", user);
 
         return this.saveUser(user);
     }
@@ -99,5 +108,12 @@ public class UserService {
 
     private String encodePassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
+    }
+
+    private void saveLog(String name, User user) {
+        activityLogService.saveLog(
+            LogType.ModifyUser,
+            name + " User \"" + user.getFullName() + "\""
+        );
     }
 }

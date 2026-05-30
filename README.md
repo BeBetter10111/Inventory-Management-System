@@ -13,11 +13,13 @@ A Web Application for Inventory Management, served as a project for Web Applicat
 
 ## How to run this project from source
 Requirement:
-- MySQL installed
+- MySQL
+- NodeJS and npm (for frontend only)
 - VSCode
 
 1. Clone this project
 2. Open the project in VSCode
 3. Import database schema and sample data found in src/main/resources to MySQL
+4. Run `npm install` inside src/main/java/iu/wadproject/ims/view/
 4. Run the project via Run and Debug tab > Select Full Stack > click run button
 5. Wait a few second for backend to initialize and you're all set.

@@ -24,10 +24,7 @@ public class SupplierService {
     }
 
     public Supplier saveSupplier(Supplier supplier) {
-        activityLogService.saveLog(
-            LogType.AdjustProduct,
-            "added Supplier \"" + supplier.getSupplierName() + "\""
-        );
+        this.saveLog("added", supplier);
 
         return repository.save(supplier);
     }
@@ -43,10 +40,23 @@ public class SupplierService {
         supplier.setContact(detail.getContact());
         supplier.setSupplierName(detail.getSupplierName());
 
+        this.saveLog("updated", supplier);
+
         return this.saveSupplier(supplier);
     }
 
     public void deleteSupplierById(UUID id) {
-        repository.deleteById(id);
+        Supplier supplier = this.getSupplierById(id);
+
+        repository.delete(supplier);
+
+        this.saveLog("deleted", supplier);
+    }
+
+    private void saveLog(String name, Supplier supplier) {
+        activityLogService.saveLog(
+            LogType.AdjustSupplier,
+            name + " Supplier \"" + supplier.getSupplierName() + "\""
+        );
     }
 }

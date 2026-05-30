@@ -7,11 +7,8 @@ export const userService = {
     
     getUser: async (username) => await fetchApi(`${endpoint}/${username}`, 'GET'),
     
-    updateUser: async (username, fullName, phoneNumber, email) => await fetchApi(`${endpoint}/${id}`, 'PATCH', {
-        username: username,
-        fullName: fullName,
-        phoneNumber: phoneNumber,
-        email: email,
+    updateUser: async (username, payload) => await fetchApi(`${endpoint}/${username}`, 'PATCH', {
+        ...payload,
     }),
 
     updatePassword: async (newRawPassword) => await fetchApi(`${endpoint}/update-password`, {

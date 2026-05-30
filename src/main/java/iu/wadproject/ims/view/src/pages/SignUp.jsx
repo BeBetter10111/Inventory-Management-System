@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/authServices'
-import { useAuth } from "../hooks/useAuth"
+import { AuthContext } from '../context/AuthContext'
 
 export default function SignUp() {
   const navigate = useNavigate()
@@ -9,12 +9,13 @@ export default function SignUp() {
     username: '',
     fullName: '',
     email: '',
-    phone: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: '',
-    role: ''
-  })
-  const auth = useAuth();
+    roleType: ''
+  });
+
+  const auth = useContext(AuthContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -24,37 +25,31 @@ export default function SignUp() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match!')
       return
     }
-    // TODO: Add registration logic
-    if (!formData.username || !formData.fullName || !formData.email || !formData.phone || !formData.password || !formData.role) {
-      alert('Please fill in all fields!')
-      return
+
+    const missingValue = Object.values(formData).find((value) => !value);
+
+    if (missingValue) {
+      alert('Please fill in required form!');
+      return;
     }
-    
-    const payLoad = {
-      userName: formData.username,
-      fullName: formData.fullName,
-      email: formData.email,
-      phone: formData.phone,
-      pw: formData.password,
-      role: formData.role
-    }
-    auth.register(payLoad);
-    
-    if (formData.role === 'staff') {
-      console.log('Sign up attempt:', formData)
-      navigate('/approval')
-    }
-    if (formData.role === 'admin') {
-      console.log('Sign up attempt:', formData)
-      navigate('/admin')
-    }
-    
+
+    await auth.register(
+      formData.username,
+      formData.password,
+      formData.fullName,
+      formData.email,
+      formData.phoneNumber,
+      formData.roleType
+    )
+
+    // Any account must be approved by existing admin
+    navigate('/approval');
   }
 
   return (
@@ -108,10 +103,10 @@ export default function SignUp() {
           <div className="form-group">
             <label htmlFor="phone">Phone Number</label>
             <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
+              type="text"
+              id="phoneNumber"
+              name="phoneNumber"
+              value={formData.phoneNumber}
               onChange={handleChange}
               placeholder="Enter your phone number"
               required
@@ -147,15 +142,15 @@ export default function SignUp() {
           <div className="form-group">
             <label htmlFor="role">Role</label>
             <select
-              id="role"
-              name="role"
-              value={formData.role}
+              id="roleType"
+              name="roleType"
+              value={formData.roleType}
               onChange={handleChange}
               required
             >
               <option value="">Select your role</option>
-              <option value="admin">Admin</option>
-              <option value="staff">Staff</option>
+              <option value="Admin">Admin</option>
+              <option value="Staff">Staff</option>
             </select>
           </div>
 

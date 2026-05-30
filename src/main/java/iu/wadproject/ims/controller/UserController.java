@@ -22,12 +22,12 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<ApiResponse> getUserByUsername(@RequestParam String username) {
+    public ResponseEntity<ApiResponse> getUserByUsername(@PathVariable String username) {
         return ResponseEntity.ok(new ApiResponse("Success", service.getUserByUsername(username)));
     }
 
     @PatchMapping("/{username}")
-    public ResponseEntity<ApiResponse> updateUserByUsername(@RequestParam String username, @RequestBody User detail) {
+    public ResponseEntity<ApiResponse> updateUserByUsername(@PathVariable String username, @RequestBody User detail) {
         return ResponseEntity.ok(new ApiResponse("User updated successfully", service.updateUserByUsername(username, detail)));
     }
 

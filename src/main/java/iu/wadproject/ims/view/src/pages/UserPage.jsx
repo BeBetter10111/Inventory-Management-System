@@ -17,10 +17,11 @@ export default function UserPage({ userRole = 'admin' }) {
   const [actioningUser, setActioningUser] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [formData, setFormData] = useState({
+    username: '',
     fullName: '',
     email: '',
-    role: 'Staff',
-    status: 'Active'
+    phoneNumber: '',
+    statusType: 'Pending',
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('All Roles')
@@ -38,19 +39,15 @@ export default function UserPage({ userRole = 'admin' }) {
     fetchUsers();
   }, [])
 
-  const handleOpenAddModal = () => {
-    setFormData({ fullName: '', email: '', role: 'Staff', status: 'Active' })
-    setIsAddModalOpen(true)
-  }
-
   const handleOpenEditModal = (user) => {
     setFormData({
+      username: user.username,
       fullName: user.fullName,
       email: user.email,
-      role: user.role,
-      status: user.status
+      phoneNumber: user.phoneNumber,
+      statusType: user.statusType,
     })
-    setEditingId(user.id)
+    setEditingId(user.userId)
     setIsEditModalOpen(true)
   }
 
@@ -59,15 +56,10 @@ export default function UserPage({ userRole = 'admin' }) {
     setIsViewModalOpen(true)
   }
 
-  const handleCloseAddModal = () => {
-    setIsAddModalOpen(false)
-    setFormData({ fullName: '', email: '', role: 'Staff', status: 'Active' })
-  }
-
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false)
     setEditingId(null)
-    setFormData({ fullName: '', email: '', role: 'Staff', status: 'Active' })
+    setFormData({ fullName: '', email: '', role: 'Staff', statusType: 'Active' })
   }
 
   const handleCloseViewModal = () => {
@@ -88,7 +80,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmDisable = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, status: 'Inactive' } : user
+        user.id === actioningUser.id ? { ...user, statusType: 'Disabled' } : user
       )
     )
     handleCloseDisableModal()
@@ -108,7 +100,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmApprove = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, status: 'Active' } : user
+        user.id === actioningUser.id ? { ...user, statusType: 'Active' } : user
       )
     )
     handleCloseApproveModal()
@@ -130,7 +122,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmReject = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, status: 'Inactive' } : user
+        user.id === actioningUser.id ? { ...user, statusType: 'Disabled' } : user
       )
     )
     handleCloseRejectModal()
@@ -150,7 +142,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmEnable = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, status: 'Active' } : user
+        user.id === actioningUser.id ? { ...user, statusType: 'Active' } : user
       )
     )
     handleCloseEnableModal()
@@ -162,31 +154,18 @@ export default function UserPage({ userRole = 'admin' }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleAddUser = () => {
-    if (formData.fullName && formData.email && formData.role) {
-      const newId = formData.fullName
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-
-      const newUser = {
-        id: newId,
-        ...formData
-      }
-      setUsers(prev => [...prev, newUser])
-      handleCloseAddModal()
-      setCurrentPage(1)
-    }
-  }
-
-  const handleEditUser = () => {
-    if (formData.fullName && formData.email && formData.role) {
+  const handleEditUser = async () => {
+    if (!Object.values(formData).find((value) => !value)) {
       setUsers(prev =>
         prev.map(user =>
-          user.id === editingId ? { ...user, ...formData } : user
+          user.userId === editingId ? { ...user, ...formData } : user
         )
       )
+
+      console.log(formData)
+
+      await userService.updateUser(formData.username, formData);
+
       handleCloseEditModal()
     }
   }
@@ -385,68 +364,6 @@ export default function UserPage({ userRole = 'admin' }) {
           </div>
         </div>
 
-        {/* Add User Modal */}
-        {isAddModalOpen && (
-          <div className="modal-overlay" onClick={handleCloseAddModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2>Add New User</h2>
-                <button className="modal-close" onClick={handleCloseAddModal}>✕</button>
-              </div>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    placeholder="Enter full name"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter email"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Role</label>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Admin">Admin</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Manager">Manager</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Status</label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Pending">Pending</option>
-                  </select>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button className="btn-secondary" onClick={handleCloseAddModal}>Cancel</button>
-                <button className="btn-primary" onClick={handleAddUser}>Add User</button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Edit User Modal */}
         {isEditModalOpen && (
           <div className="modal-overlay" onClick={handleCloseEditModal}>
@@ -477,27 +394,15 @@ export default function UserPage({ userRole = 'admin' }) {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Role</label>
-                  <select
-                    name="role"
-                    value={formData.role}
-                    onChange={handleInputChange}
-                  >
-                    <option value="Admin">Admin</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Manager">Manager</option>
-                  </select>
-                </div>
-                <div className="form-group">
                   <label>Status</label>
                   <select
-                    name="status"
-                    value={formData.status}
+                    name="statusType"
+                    value={formData.statusType}
                     onChange={handleInputChange}
                   >
                     <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
                     <option value="Pending">Pending</option>
+                    <option value="Disabled">Disabled</option>
                   </select>
                 </div>
               </div>
