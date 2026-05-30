@@ -112,6 +112,17 @@ export default function Products({ userRole = "admin" }) {
     console.log(formData);
 
     if (formData.productName && formData.category && formData.price) {
+
+      const isDuplicate = products.some(
+            (p) =>
+                p.productName.trim().toLowerCase() === formData.productName.trim().toLowerCase() &&
+                p.category?.categoryId === formData.category
+        );
+
+        if (isDuplicate) {
+            showNotification('error', `Product "${formData.productName}"`);
+            return; 
+        }
       try {
         const selectedCategory = await categoryService.getCategory(formData.category);
 
@@ -140,6 +151,17 @@ export default function Products({ userRole = "admin" }) {
 
   const handleEditProduct = async () => {
     if (formData.productName && formData.category && formData.price) {
+      const isDuplicate = products.some(
+            (p) =>
+                p.productId !== editingId &&
+                p.productName.trim().toLowerCase() === formData.productName.trim().toLowerCase() &&
+                p.category?.categoryId === formData.category
+        );
+
+        if (isDuplicate) {
+            showNotification('error', `Tên sản phẩm "${formData.productName}" đã bị trùng trong danh mục này!`);
+            return; 
+        }
       try {
         const updatedProduct = await productService.updateProduct(
           editingId,
@@ -322,7 +344,7 @@ export default function Products({ userRole = "admin" }) {
                             className="btn-more"
                             onClick={() => handleOpenDeleteModal(product)}
                           >
-                            •••
+                            Delete
                           </button>
                         </td>
                       )}
@@ -401,6 +423,8 @@ export default function Products({ userRole = "admin" }) {
                     <label>Stock Quantity</label>
                     <input
                       type="number"
+                      min = "1"
+                      step = "1"
                       name="stockQuantity"
                       placeholder="Enter quantity"
                       value={formData.stockQuantity}
@@ -473,6 +497,8 @@ export default function Products({ userRole = "admin" }) {
                     <label>Stock Quantity</label>
                     <input
                       type="number"
+                      min = "1"
+                      step = "1"
                       name="stockQuantity"
                       value={formData.stockQuantity}
                       onChange={handleInputChange}

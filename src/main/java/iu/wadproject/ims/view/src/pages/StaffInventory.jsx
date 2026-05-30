@@ -128,7 +128,7 @@ export default function StaffInventory({ userRole = 'staff' }) {
                     <select className="filter-select" style={{ flex: 2, padding: '12px' }}>
                       <option value="">Select a product</option>
                     </select>
-                    <input type="number" placeholder="Quantity" style={{ flex: 1, padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
+                    <input type="number" min = "1" placeholder="Quantity" style={{ flex: 1, padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
                     <button type="button" onClick={() => removeImportProductRow(p.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '18px' }}>✕</button>
                   </div>
                 ))}
@@ -174,7 +174,7 @@ export default function StaffInventory({ userRole = 'staff' }) {
                     <select className="filter-select" style={{ flex: 2, padding: '12px' }}>
                       <option value="">Select a product</option>
                     </select>
-                    <input type="number" placeholder="Quantity" style={{ flex: 1, padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
+                    <input type="number" min = "1" placeholder="Quantity" style={{ flex: 1, padding: '12px', border: '1px solid var(--border-color)', borderRadius: '8px' }} />
                     <button type="button" onClick={() => removeExportProductRow(p.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '18px' }}>✕</button>
                   </div>
                 ))}

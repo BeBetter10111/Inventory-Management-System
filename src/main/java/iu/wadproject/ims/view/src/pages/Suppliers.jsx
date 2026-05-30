@@ -76,6 +76,14 @@ export default function Suppliers({ userRole = 'admin' }) {
   }
 
   const handleAddSupplier = async () => {
+    const isDuplicate = suppliers.some(
+            (s) => s.supplierName.trim().toLowerCase() === formData.supplierName.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            showNotification('error', `Nhà cung cấp "${formData.supplierName}" đã tồn tại trong hệ thống!`);
+            return; 
+        }
     if (formData.supplierName && formData.contact && formData.address) {
       try {
         const newSupplier = await supplierService.createSupplier(
@@ -96,6 +104,15 @@ export default function Suppliers({ userRole = 'admin' }) {
 
   const handleEditSupplier = async () => {
     if (formData.supplierName && formData.contact && formData.address) {
+      const isDuplicate = suppliers.some(
+            (s) => s.supplierId !== editingId && 
+                   s.supplierName.trim().toLowerCase() === formData.supplierName.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            showNotification('error', `Tên nhà cung cấp "${formData.supplierName}" đã trùng với một nhà cung cấp khác!`);
+            return; 
+        }
       try {
         const updatedSupplier = await supplierService.updateSupplier(editingId, formData.supplierName, formData.contact, formData.address);
         setSuppliers(prev =>
@@ -216,7 +233,7 @@ export default function Suppliers({ userRole = 'admin' }) {
                       {userRole === 'admin' && (
                         <>
                           <button className="btn-edit" onClick={() => handleOpenEditModal(supplier)}>Edit</button>
-                          <button className="btn-more" onClick={() => handleOpenDeleteModal(supplier)}>•••</button>
+                          <button className="btn-more" onClick={() => handleOpenDeleteModal(supplier)}>Delete</button>
                         </>
                       )}
                     </td>

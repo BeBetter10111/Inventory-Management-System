@@ -2,6 +2,19 @@ CREATE DATABASE `inventory_management_system`;
 
 USE `inventory_management_system`;
 
+CREATE TABLE `user` (
+    `user_id` BINARY(16) UNIQUE NOT NULL,
+    `email` VARCHAR(150) UNIQUE NOT NULL,
+    `full_name` VARCHAR(200) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `phone_number` VARCHAR(20) UNIQUE NOT NULL,
+    `role_type` ENUM('Admin', 'Staff') NOT NULL,
+    `status_type` ENUM('Active', 'Disabled', 'Pending') NOT NULL,
+    `username` VARCHAR(100) UNIQUE NOT NULL,
+
+    PRIMARY KEY (`user_id`),
+);
+
 CREATE TABLE `activity_log` (
     `activity_id` BINARY(16) NOT NULL,
     `description` VARCHAR(255) NOT NULL,
@@ -16,17 +29,18 @@ CREATE TABLE `activity_log` (
 CREATE TABLE `buyer` (
     `buyer_id` BINARY(16) NOT NULL,
     `address` VARCHAR(300) NOT NULL,
-    `full_name` VARCHAR(200) NOT NULL,
+    `full_name` VARCHAR(200) UNIQUE NOT NULL,
 
     PRIMARY KEY (`buyer_id`)
 );
 
-CREATE TABLE `category` (
+CREATE TABLE `category` (           
     `category_id` BINARY(16) NOT NULL,
-    `category_name` VARCHAR(200) NOT NULL,
-    `unit` VARCHAR(50) NOT NULL,
+    `category_name` VARCHAR(200) UNIQUE NOT NULL,
+    `unit` VARCHAR(50)  UNIQUE NOT NULL,
 
-    PRIMARY KEY (`category_id`)
+    PRIMARY KEY (`category_id`),
+    UNIQUE KEY `unique_category_unit` (`category_name`, `unit`) -- Fixes duplicates
 );
 
 CREATE TABLE `product` (
@@ -39,13 +53,14 @@ CREATE TABLE `product` (
 
     PRIMARY KEY (`product_id`),
     FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
+    UNIQUE KEY `unique_product_in_category` (`product_name`, `category_id`)
 );
 
 CREATE TABLE `supplier` (
     `supplier_id` BINARY(16) NOT NULL,
     `address` VARCHAR(255) NOT NULL,
     `contact` VARCHAR(255) NOT NULL,
-    `supplier_name` VARCHAR(255) NOT NULL,
+    `supplier_name` VARCHAR(255) UNIQUE NOT NULL,
 
     PRIMARY KEY (`supplier_id`)
 );
@@ -75,18 +90,4 @@ CREATE TABLE `transaction_detail` (
     PRIMARY KEY (`detail_id`),
     FOREIGN KEY (`transaction_id`) REFERENCES `transaction` (`transaction_id`),
     FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`)
-);
-
-CREATE TABLE `user` (
-    `user_id` BINARY(16) NOT NULL,
-    `email` VARCHAR(150) NOT NULL,
-    `full_name` VARCHAR(200) NOT NULL,
-    `password` VARCHAR(255) NOT NULL,
-    `phone_number` VARCHAR(20) NOT NULL,
-    `role_type` ENUM('Admin', 'Staff') NOT NULL,
-    `status_type` ENUM('Active', 'Disabled', 'Pending') NOT NULL,
-    `username` VARCHAR(100) NOT NULL,
-
-    PRIMARY KEY (`user_id`),
-    UNIQUE (`username`)
 );

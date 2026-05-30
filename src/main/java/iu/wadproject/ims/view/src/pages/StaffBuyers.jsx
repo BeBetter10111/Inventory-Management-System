@@ -78,6 +78,15 @@ export default function Buyers({ userRole = 'admin' }) {
 
   const handleAddBuyer = async () => {
     if (formData.fullName && formData.address) {
+      //Fix Duplicate
+      const isDuplicate = buyers.some(
+            (b) => b.fullName.trim().toLowerCase() === formData.fullName.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            showNotification('error', `Buyer"${formData.fullName}" is already existed`);
+            return; 
+        }
       try {
         const newBuyer = await buyerService.createBuyer(formData.fullName, formData.address);
 
@@ -95,6 +104,16 @@ export default function Buyers({ userRole = 'admin' }) {
 
   const handleEditBuyer = async () => {
     if (formData.fullName && formData.address) {
+      //Fix Duplicate
+      const isDuplicate = buyers.some(
+            (b) => b.buyerId !== editingId && 
+                   b.fullName.trim().toLowerCase() === formData.fullName.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            showNotification('error', `Buyer "${formData.fullName}" is already existed!`);
+            return; 
+        }
       try {
         const updatedBuyer = await buyerService.updateBuyer(editingId, formData.fullName, formData.address);
 
@@ -213,7 +232,7 @@ export default function Buyers({ userRole = 'admin' }) {
                     {userRole === 'admin' && (
                       <td className="actions-cell">
                         <button className="btn-edit" onClick={() => handleOpenEditModal(buyer)}>Edit</button>
-                        <button className="btn-more" onClick={() => handleOpenDeleteModal(buyer)}>•••</button>
+                        <button className="btn-more" onClick={() => handleOpenDeleteModal(buyer)}>Delete</button>
                       </td>
                     )}
                   </tr>
@@ -396,7 +415,7 @@ export default function Buyers({ userRole = 'admin' }) {
                     {userRole === 'admin' && (
                       <td className="actions-cell">
                         <button className="btn-edit" onClick={() => handleOpenEditModal(buyer)}>Edit</button>
-                        <button className="btn-more" onClick={() => handleOpenDeleteModal(buyer)}>•••</button>
+                        <button className="btn-more" onClick={() => handleOpenDeleteModal(buyer)}>Delete</button>
                       </td>
                     )}
                   </tr>

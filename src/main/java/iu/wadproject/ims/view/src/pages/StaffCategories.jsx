@@ -81,7 +81,7 @@ export default function Categories({ userRole = 'admin' }) {
                 cat.categoryName.trim().toLowerCase() === formData.categoryName.trim().toLowerCase() &&
                 cat.unit.trim().toLowerCase() === formData.unit.trim().toLowerCase()
         );
-
+        
         if (isDuplicate) {
             showNotification('error', 'A category with this name and unit already exists.');
             return; // Stop execution here
@@ -233,7 +233,7 @@ export default function Categories({ userRole = 'admin' }) {
                     {userRole === 'admin' && (
                       <td className="actions-cell">
                         <button className="btn-edit" onClick={() => handleOpenEditModal(category)}>Edit</button>
-                        <button className="btn-more" onClick={() => handleOpenDeleteModal(category)}>•••</button>
+                        <button className="btn-more" onClick={() => handleOpenDeleteModal(category)}>Delete</button>
                       </td>
                     )}
                   </tr>
@@ -412,7 +412,7 @@ export default function Categories({ userRole = 'admin' }) {
                     {userRole === 'admin' && (
                       <td className="actions-cell">
                         <button className="btn-edit" onClick={() => handleOpenEditModal(category)}>Edit</button>
-                        <button className="btn-more" onClick={() => handleOpenDeleteModal(category)}>•••</button>
+                        <button className="btn-more" onClick={() => handleOpenDeleteModal(category)}>Delete</button>
                       </td>
                     )}
                   </tr>

@@ -39,17 +39,35 @@ export default function SignUp() {
       return;
     }
 
-    await auth.register(
-      formData.username,
-      formData.password,
-      formData.fullName,
-      formData.email,
-      formData.phoneNumber,
-      formData.roleType
-    )
+    //Fix Duplicate
+    const isDuplicate = users.some(
+    (user) =>
+        user.username.toLowerCase() === formData.username.trim().toLowerCase() ||
+        user.email.toLowerCase() === formData.email.trim().toLowerCase() ||
+        user.phoneNumber === formData.phoneNumber.trim()
+);
 
-    // Any account must be approved by existing admin
-    navigate('/approval');
+if (isDuplicate) {
+    alert('Username, Email, or Phone Number is already registered!');
+    return; // Block submission
+}
+
+    try {
+        await auth.register(
+            formData.username.trim(),
+            formData.password,
+            formData.fullName.trim(),
+            formData.email.trim().toLowerCase(),
+            formData.phoneNumber.trim(),
+            formData.roleType
+        );
+
+        navigate('/approval');
+        
+    } catch (error) {
+        console.error("Registration error:", error);
+        alert(error.response?.data?.message || error.message || 'Registration failed. Username, email, or phone number may already be in use.');
+    }
   }
 
   return (
