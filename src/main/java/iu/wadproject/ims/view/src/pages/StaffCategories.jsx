@@ -75,6 +75,17 @@ export default function Categories({ userRole = 'admin' }) {
 
   const handleAddCategory = async () => {
     if (formData.categoryName && formData.unit) {
+      //fix duplicate
+      const isDuplicate = categories.some(
+            (cat) =>
+                cat.categoryName.trim().toLowerCase() === formData.categoryName.trim().toLowerCase() &&
+                cat.unit.trim().toLowerCase() === formData.unit.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            showNotification('error', 'A category with this name and unit already exists.');
+            return; // Stop execution here
+        }
       try {
         const newCategory = await categoryService.createCategory(
           formData.categoryName,
@@ -93,6 +104,18 @@ export default function Categories({ userRole = 'admin' }) {
 
   const handleEditCategory = async () => {
     if (formData.categoryName && formData.unit) {
+      //fix duplicate
+      const isDuplicate = categories.some(
+            (cat) =>
+                cat.categoryId !== editingId && // Replace with your actual ID field name if different
+                cat.categoryName.trim().toLowerCase() === formData.categoryName.trim().toLowerCase() &&
+                cat.unit.trim().toLowerCase() === formData.unit.trim().toLowerCase()
+        );
+
+        if (isDuplicate) {
+            showNotification('error', 'Another category with this name and unit already exists.');
+            return; // Stop execution here
+        }
       try {
         const updatedCategory = await categoryService.updateCategory(editingId, formData.categoryName, formData.unit);
         setCategories(prev =>

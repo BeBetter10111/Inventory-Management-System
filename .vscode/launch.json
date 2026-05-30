@@ -12,7 +12,8 @@
             "type": "node",
             "name": "Client",
             "request": "launch",
-            "program": "${workspaceFolder}/src/main/java/iu/wadproject/ims/view/node_modules/.bin/vite",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"],
             "cwd": "${workspaceFolder}/src/main/java/iu/wadproject/ims/view",
             "skipFiles": [
                 "node_modules/**"

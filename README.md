@@ -21,5 +21,9 @@ Requirement:
 2. Open the project in VSCode
 3. Import database schema and sample data found in src/main/resources to MySQL
 4. Run `npm install` inside src/main/java/iu/wadproject/ims/view/
-4. Run the project via Run and Debug tab > Select Full Stack > click run button
-5. Wait a few second for backend to initialize and you're all set.
+5. Configure MySQL username and password in application.properties
+6. Run the project via Run and Debug tab > Select Full Stack > click run button
+7. Wait a few second for backend to initialize and you're all set.
+
+Default user:admin
+password:Admin
