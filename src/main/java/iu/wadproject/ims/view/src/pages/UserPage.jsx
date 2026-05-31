@@ -80,7 +80,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmDisable = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, statusType: 'Disabled' } : user
+        user.userId === actioningUser.userId ? { ...user, statusType: 'Disabled' } : user
       )
     )
     handleCloseDisableModal()
@@ -100,7 +100,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmApprove = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, statusType: 'Active' } : user
+        user.userId === actioningUser.userId ? { ...user, statusType: 'Active' } : user
       )
     )
     handleCloseApproveModal()
@@ -122,7 +122,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmReject = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, statusType: 'Disabled' } : user
+        user.userId === actioningUser.userId ? { ...user, statusType: 'Disabled' } : user
       )
     )
     handleCloseRejectModal()
@@ -142,7 +142,7 @@ export default function UserPage({ userRole = 'admin' }) {
   const handleConfirmEnable = () => {
     setUsers(prev =>
       prev.map(user =>
-        user.id === actioningUser.id ? { ...user, statusType: 'Active' } : user
+        user.userId === actioningUser.userId ? { ...user, statusType: 'Active' } : user
       )
     )
     handleCloseEnableModal()
@@ -172,7 +172,7 @@ export default function UserPage({ userRole = 'admin' }) {
 
   const handleDeleteUser = (id) => {
     if (confirm('Are you sure you want to delete this user?')) {
-      setUsers(prev => prev.filter(user => user.id !== id))
+      setUsers(prev => prev.filter(user => user.userId !== id))
     }
   }
 
@@ -279,7 +279,7 @@ export default function UserPage({ userRole = 'admin' }) {
               </thead>
               <tbody>
                 {paginatedUsers.map(user => (
-                  <tr key={user.id}>
+                  <tr key={user.userId}>
                     <td className="col-checkbox">
                       <input type="checkbox" />
                     </td>
@@ -319,7 +319,7 @@ export default function UserPage({ userRole = 'admin' }) {
                             Edit
                           </button>
                           <button
-                            onClick={() => handleDeleteUser(user.id)}
+                            onClick={() => handleDeleteUser(user.userId)}
                             className="dropdown-item delete"
                           >
                             Delete
@@ -423,9 +423,9 @@ export default function UserPage({ userRole = 'admin' }) {
               <div className="profile-card-header">
                 <h3>{viewingUser.fullName}</h3>
                 <span className={`profile-badge profile-badge-${viewingUser.statusType.toLowerCase()}`}>
-                  {viewingUser.status}
+                  {viewingUser.statusType}
                 </span>
-                {viewingUser.role && <span className="profile-role-badge">{viewingUser.role}</span>}
+                {viewingUser.roleType && <span className="profile-role-badge">{viewingUser.roleType}</span>}
               </div>
 
               <div className="profile-card-body">
@@ -434,10 +434,6 @@ export default function UserPage({ userRole = 'admin' }) {
                   <p>Update your personal details and information.</p>
                   
                   <div className="profile-info-grid">
-                    <div className="info-item">
-                      <label>Username</label>
-                      <span>{viewingUser.id}</span>
-                    </div>
                     <div className="info-item">
                       <label>Full Name</label>
                       <span>{viewingUser.fullName}</span>
@@ -450,8 +446,8 @@ export default function UserPage({ userRole = 'admin' }) {
                       <span>{viewingUser.email}</span>
                     </div>
                     <div className="info-item">
-                      <label>Role</label>
-                      <span>{viewingUser.role}</span>
+                      <label>Status Type</label>
+                      <span>{viewingUser.statusType}</span>
                     </div>
                   </div>
                 </div>

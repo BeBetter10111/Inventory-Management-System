@@ -28,18 +28,18 @@ public class SupplierController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getSupplierById(@RequestParam UUID id) {
-        return ResponseEntity.ok(new ApiResponse("Success", service.getSupplierById(id)));
+    public ResponseEntity<ApiResponse> getSupplierById(@PathVariable String id) {
+        return ResponseEntity.ok(new ApiResponse("Success", service.getSupplierById(UUID.fromString(id))));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateSupplierById(@RequestParam UUID id, @RequestBody Supplier detail) {
-        return ResponseEntity.ok(new ApiResponse("Buyer updated successfully", service.updateSupplierById(id, detail)));
+    public ResponseEntity<ApiResponse> updateSupplierById(@PathVariable String id, @RequestBody Supplier detail) {
+        return ResponseEntity.ok(new ApiResponse("Buyer updated successfully", service.updateSupplierById(UUID.fromString(id), detail)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteSupplier(@RequestParam UUID id) {
-        service.deleteSupplierById(id);
+    public ResponseEntity<ApiResponse> deleteSupplier(@PathVariable String id) {
+        service.deleteSupplierById(UUID.fromString(id));
         return ResponseEntity.ok(new ApiResponse("Buyer deleted successfully", null));
     }
 }

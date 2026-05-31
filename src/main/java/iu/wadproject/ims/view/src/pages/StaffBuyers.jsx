@@ -309,7 +309,7 @@ export default function Buyers({ userRole = 'admin' }) {
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
+                    value={formData.fullName}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -407,11 +407,10 @@ export default function Buyers({ userRole = 'admin' }) {
               </thead>
               <tbody>
                 {filteredBuyers.map((buyer) => (
-                  <tr key={buyer.id}>
-                    <td>{buyer.id}</td>
-                    <td>{buyer.name}</td>
-                    <td>{buyer.phoneNumber}</td>
-                    <td>{buyer.email}</td>
+                  <tr key={buyer.buyerId}>
+                    <td>{buyer.buyerId}</td>
+                    <td>{buyer.buyerName}</td>
+                    <td>{buyer.address}</td>
                     {userRole === 'admin' && (
                       <td className="actions-cell">
                         <button className="btn-edit" onClick={() => handleOpenEditModal(buyer)}>Edit</button>
