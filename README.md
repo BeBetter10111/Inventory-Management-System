@@ -25,5 +25,7 @@ Requirement:
 6. Run the project via Run and Debug tab > Select Full Stack > click run button
 7. Wait a few second for backend to initialize and you're all set.
 
-Default user:admin
-password:Admin
+## Default admin account
+Username: admin
+
+Password: admin
