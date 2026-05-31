@@ -98,8 +98,8 @@ public class UserService {
             String username = ((UserDetails) principal).getUsername();
             return this.getUserByUsername(username);
         }
-
-        throw new InvalidParameterException("No authenticated user found");
+        
+        return null;
     }
 
     private boolean isPasswordValid(String rawPassword, String encodedPassword) {

@@ -1,7 +1,8 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/authServices'
 import { AuthContext } from '../context/AuthContext'
+import { userService } from '../services/userService.js'
 
 export default function SignUp() {
   const navigate = useNavigate()
@@ -14,8 +15,19 @@ export default function SignUp() {
     confirmPassword: '',
     roleType: ''
   });
+  const [users, setUsers] = useState([]);
 
   const auth = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const users = await userService.getAllUsers();
+
+      setUsers(users || []);
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target

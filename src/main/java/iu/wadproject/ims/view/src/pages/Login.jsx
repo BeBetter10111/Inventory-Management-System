@@ -34,10 +34,12 @@ export default function Login() {
         formData.rememberMe,
       );
 
+      console.log(user);
+
       if (user.status === "Pending") {
         navigate("/approval");
       } else {
-        if (user.roleType === "Staff") {
+        if (user.role === "Staff") {
           navigate("/staff");
         } else {
           navigate("/admin");
