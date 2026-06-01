@@ -17,12 +17,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        iu.wadproject.ims.entity.User user = repository.findByUsername(username).orElseThrow();
+        iu.wadproject.ims.entity.User user = repository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
         return User.builder()
             .username(user.getUsername())
             .password(user.getPassword())
-            .authorities(user.getRoleType().toString())
+            .authorities(user.getRoleType().toString()) 
             .build();
     }
 }
