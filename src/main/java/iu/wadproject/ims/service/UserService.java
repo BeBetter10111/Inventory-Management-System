@@ -7,6 +7,10 @@ import iu.wadproject.ims.entity.User;
 import iu.wadproject.ims.entity.enums.LogType;
 import iu.wadproject.ims.repository.UserRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 
 import java.security.InvalidParameterException;
@@ -28,6 +32,12 @@ public class UserService {
 
     @Autowired
     private ActivityLogService activityLogService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired 
+    private UserRepository userRepository;
 
     public List<User> getAllUsers() {
         return repository.findAll();
@@ -115,5 +125,20 @@ public class UserService {
             LogType.ModifyUser,
             name + " User \"" + user.getFullName() + "\""
         );
+    }
+
+    //Update:Send email with UUID for password reset
+    public String processForgotPassword(String email) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email not found"));
+
+        String resetUuid = UUID.randomUUID().toString();
+
+        user.setResetToken(resetUuid); 
+        userRepository.save(user);
+
+        emailService.sendResetPasswordEmail(email, resetUuid);
+
+        return resetUuid;
     }
 }

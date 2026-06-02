@@ -5,12 +5,29 @@ export default function ForgotPassword() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // TODO: Call API to request password reset
-    console.log('Reset password request for:', email)
-    navigate('/reset-uuid')
-  }
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email }), 
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate('/verify-uuid', { state: { email: email, uuid: data.uuid } });
+      } else {
+        alert(data.message || 'Email không tồn tại hoặc có lỗi xảy ra!');
+      }
+    } catch (error) {
+      console.error('Lỗi kết nối API:', error);
+      alert('Không thể kết nối đến máy chủ Backend!');
+    }
+  };
 
   return (
     <div className="container auth-container">

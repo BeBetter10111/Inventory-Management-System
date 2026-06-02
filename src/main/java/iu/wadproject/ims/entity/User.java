@@ -35,4 +35,7 @@ public class User {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType roleType = RoleType.Staff;
+
+    @Column(name = "reset_token")
+    private String resetToken;
 }

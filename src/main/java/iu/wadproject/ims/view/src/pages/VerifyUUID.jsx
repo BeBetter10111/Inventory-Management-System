@@ -1,22 +1,29 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 export default function VerifyUUID() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [uuid, setUuid] = useState('')
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    // TODO: Call API to verify UUID
-    console.log('Verifying UUID:', uuid)
-    navigate('/new-password')
-  }
+    e.preventDefault();
+
+    const correctUuid = location.state?.uuid;
+
+    if (correctUuid && uuid === correctUuid) {
+      navigate('/new-password', { state: { email: location.state?.email, uuid: uuid } });
+    } else {
+      alert('Your UUID is invalid! Please check your email and try again.');
+    }
+  };
 
   return (
     <div className="container auth-container">
       <div className="auth-box">
         <h1>Inventory Management System</h1>
-        
+
         <form onSubmit={handleSubmit} className="auth-form">
           <h2>Verify your UUID</h2>
           <p className="form-description">Enter your UUID you received earlier to verify</p>

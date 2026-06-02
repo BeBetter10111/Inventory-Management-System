@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 export default function ForgotPasswordUUID() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [copied, setCopied] = useState(false)
   
-  // Generate a random UUID for demo purposes
-  const uuid = 'de7f04b0-743c-44a9-80b6-46c5903221a'
+  const uuid = location.state?.uuid || 'Not Found'
+  const email = location.state?.email || ''  
 
   const handleCopy = () => {
     navigator.clipboard.writeText(uuid)

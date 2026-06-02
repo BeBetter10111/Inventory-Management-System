@@ -33,7 +33,6 @@ export default function App() {
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/approval" element={<ApprovalWait />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-uuid" element={<ForgotPasswordUUID />} />
                     <Route path="/verify-uuid" element={<VerifyUUID />} />
                     <Route path="/new-password" element={<NewPassword />} />
             
