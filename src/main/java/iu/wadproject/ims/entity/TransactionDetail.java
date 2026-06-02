@@ -1,5 +1,7 @@
 package iu.wadproject.ims.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.util.UUID;
 
 import iu.wadproject.ims.entity.enums.UnitPriceType;
@@ -8,6 +10,7 @@ import lombok.*;
 
 @Entity
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "detailId")
 public class TransactionDetail {
     @Id @GeneratedValue
     private UUID detailId;

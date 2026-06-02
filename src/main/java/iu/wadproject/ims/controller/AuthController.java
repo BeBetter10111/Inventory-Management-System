@@ -5,7 +5,6 @@ import iu.wadproject.ims.dto.request.RegisterRequest;
 import iu.wadproject.ims.dto.response.ApiResponse;
 import iu.wadproject.ims.dto.response.UserResponse;
 import iu.wadproject.ims.entity.enums.RoleType;
-import iu.wadproject.ims.service.EmailService;
 import iu.wadproject.ims.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,9 +25,6 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -38,9 +34,6 @@ import java.util.HashMap;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
     private final UserService userService;
-
-    @Autowired
-    private EmailService emailService;
 
     @Autowired
     private AuthenticationManager authenticationManager;

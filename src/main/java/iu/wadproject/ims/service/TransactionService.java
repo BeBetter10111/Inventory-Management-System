@@ -50,7 +50,11 @@ public class TransactionService {
         request.getDetails().forEach(detail -> {
             Product productInDb = productService.getProductById(detail.getProduct().getProductId());
 
-            productInDb.setStockQuantity(productInDb.getStockQuantity() + detail.getQuantity());
+            int quantityDelta = request.getTransactionType() == TransactionType.Import
+                ? detail.getQuantity()
+                : -detail.getQuantity();
+
+            productInDb.setStockQuantity(productInDb.getStockQuantity() + quantityDelta);
             productService.saveProduct(productInDb);
 
             TransactionDetail transactionDetail = new TransactionDetail();
@@ -60,7 +64,9 @@ public class TransactionService {
             transactionDetail.setQuantity(detail.getQuantity());
             transactionDetail.setUnitPriceType(detail.getUnitPriceType());
 
-            transactionDetailService.saveTransactionDetail(transactionDetail);
+            TransactionDetail savedDetail = transactionDetailService.saveTransactionDetail(transactionDetail);
+            // maintain bi-directional relationship in memory so later reads/counts work
+            savedTransaction.getTransactionDetails().add(savedDetail);
         });
 
         this.saveLog(savedTransaction);
@@ -82,7 +88,7 @@ public class TransactionService {
             suffix = "to Buyer " + transaction.getBuyer().getFullName();
         }
 
-        int productAmounts = transaction.getTransactionDetails().size();
+        int productAmounts = transaction.getTransactionDetails() == null ? 0 : transaction.getTransactionDetails().size();
 
         String description = name + " " + productAmounts + " products " + suffix;
 

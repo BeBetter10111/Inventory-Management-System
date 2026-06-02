@@ -2,14 +2,18 @@ package iu.wadproject.ims.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import iu.wadproject.ims.entity.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "transactionId")
 public class Transaction {
     @Id @GeneratedValue
     private UUID transactionId;
@@ -36,5 +40,5 @@ public class Transaction {
     private String note = null;
 
     @OneToMany(mappedBy = "transaction")
-    private List<TransactionDetail> transactionDetails;
+    private List<TransactionDetail> transactionDetails = new ArrayList<>();
 }

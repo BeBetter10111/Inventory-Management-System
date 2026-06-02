@@ -7,7 +7,7 @@ export const transactionService = {
 
     getTransaction: async (id) => await fetchApi(`${endpoint}/${id}`, 'GET'),
 
-    processTransaction: async (transactionType, supplier, buyer, note, details) => await fetchApi(`${endpoint}/process`, {
+    processTransaction: async (transactionType, supplier, buyer, note, details) => await fetchApi(`${endpoint}/process`, 'POST', {
         transactionType: transactionType,
         supplier: supplier,
         buyer: buyer,

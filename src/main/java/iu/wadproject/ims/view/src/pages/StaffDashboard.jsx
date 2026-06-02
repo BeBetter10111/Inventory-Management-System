@@ -1,13 +1,35 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { LineChart, BarChart } from '../components/Charts'
+import { productService } from '../services/productService.js'
+import { transactionService } from '../services/transactionService.js'
 
 export default function StaffDashboard() {
-  const stats = {
+  const [stats, setStats] = useState({
     totalProducts: 0,
-    totalTransactions: 0
-  }
+    totalTransactions: 0,
+  })
   const [recentTransactions, setRecentTransactions] = useState([])
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [products, transactions] = await Promise.all([
+          productService.getAllProducts(),
+          transactionService.getAllTransactions(),
+        ])
+
+        setStats({
+          totalProducts: Array.isArray(products) ? products.length : 0,
+          totalTransactions: Array.isArray(transactions) ? transactions.length : 0,
+        })
+      } catch (error) {
+        console.error('Unable to load dashboard stats', error)
+      }
+    }
+
+    fetchStats()
+  }, [])
 
   const transactionTrendData = [30, 45, 35, 60, 50, 55]
   const importExportData = [
