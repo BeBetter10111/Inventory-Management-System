@@ -11,7 +11,7 @@ export const userService = {
         ...payload,
     }),
 
-    updatePassword: async (newRawPassword) => await fetchApi(`${endpoint}/update-password`, {
+    updatePassword: async (newRawPassword) => await fetchApi(`${endpoint}/update-password`, 'PATCH', {
         newRawPassword: newRawPassword,
     }),
 };

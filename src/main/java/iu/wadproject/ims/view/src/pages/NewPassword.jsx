@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { userService } from '../services/userService.js'
 
 export default function NewPassword() {
   const navigate = useNavigate()
@@ -16,15 +17,16 @@ export default function NewPassword() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (formData.password !== formData.confirmPassword) {
       alert('Passwords do not match!')
       return
     }
-    // TODO: Call API to reset password
-    console.log('Resetting password')
-    navigate('/login')
+    
+    await userService.updatePassword(formData.password);
+
+    navigate('/login');
   }
 
   return (

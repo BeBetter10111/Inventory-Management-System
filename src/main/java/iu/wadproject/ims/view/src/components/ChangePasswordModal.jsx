@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { userService } from '../services/userService.js'
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -35,8 +36,8 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
       return
     }
 
-    // TODO: Call API to change password
-    console.log('Changing password')
+    userService.updatePassword(formData.newPassword);
+    
     handleClose()
   }
 
